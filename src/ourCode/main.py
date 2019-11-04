@@ -90,14 +90,18 @@ class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
         super(StyleSelection, self).__init__()
         
+        self.label = topleft_label()
+        self.label.text = "Select the style of music that you would like to replicate."
+        self.add_widget(self.label)
+
         self.orientation = "vertical"
         #size = (1, .5)
 
-        b1 = Button(text="Chainsmokers", size = (500, 500), pos = (Window.width/2, Window.height/2))
+        b1 = Button(text="Chainsmokers", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
         b1.bind(on_press=styleCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
+        b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
         # b2.bind(on_press=styleCallback)
         self.option2 = b2
         
@@ -109,13 +113,16 @@ class ChordSelection(FloatLayout):
         super(ChordSelection, self).__init__()
         
         self.orientation = "vertical"
-        size = (1, 1)
 
-        b1 = Button(text="1", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2))
+        self.label = topleft_label()
+        self.label.text = "Select the chords you would like to use."
+        self.add_widget(self.label)
+
+        b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
         b1.bind(on_press=chordCallback)
         self.option1 = b1
 
-        b2 = Button(text="2", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
+        b2 = Button(text="2", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
         b2.bind(on_press=chordCallback)
         self.option2 = b2
         
@@ -129,11 +136,15 @@ class PercSelection(FloatLayout):
         self.orientation = "vertical"
         size = (1, 1)
 
-        b1 = Button(text="1", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2))
+        self.label = topleft_label()
+        self.label.text = "Select the percussion you would like to use."
+        self.add_widget(self.label)
+
+        b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
         b1.bind(on_press=percCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
+        b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
         b2.bind(on_press=percCallback)
         self.option2 = b2
         
@@ -147,7 +158,7 @@ class MelodySelection(Widget):
         w = Window.width
         h = Window.height
         padding = 50
-
+        
         # Audio Generation
         self.synth = synth
         self.sched = sched
