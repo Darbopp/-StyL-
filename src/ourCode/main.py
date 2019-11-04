@@ -247,7 +247,6 @@ class MainWidget(BaseWidget):
         self.style = None
         self.chords = None
         self.perc = None
-        self.melody = None
 
         self.melody_selection = None
 
@@ -269,8 +268,8 @@ class MainWidget(BaseWidget):
         self.melody_selection = MelodySelection(
             self.synth, 
             self.sched, 
-            chords[self.style][2], 
-            percussion[self.style][1],
+            chords[self.style][self.chords], 
+            percussion[self.style][self.perc],
             melody[self.style][1]
             )
 
