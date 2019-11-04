@@ -15,6 +15,8 @@ from kivy.core.window import Window
 from kivy.clock import Clock as kivyClock
 from kivy.uix.label import Label
 from kivy.uix.button import Button
+from kivy.uix.widget import Widget
+from kivy.uix.boxlayout import BoxLayout
 from kivy.graphics.instructions import InstructionGroup
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
@@ -25,41 +27,6 @@ from barPlayer import StaticBarPlayer, ComposeBarPlayer
 #               Note Values              #
 # Written in (pitch, start beat, length) #
 ##########################################
-closerChords = [(37,0,2.5), (44,0,2.5), (53,0,2.5), (56,0,2.5), (63,0,2.5),  
-                        (39,2.5,1.5), (46,2.5,1.5), (55,2.5,1.5), (58,2.5,1.5), (63,2.5,1.5), 
-                        (41,4,2.5), (48,4,2.5), (56,4,2.5), (60,4,2.5), (63,4,2.5), 
-                        (39,6.5,1.5), (46,6.5,1.5), (55,6.5,1.5), (58,6.5,1.5), (63,6.5,1.5),
-
-                        (37,8,2.5), (44,8,2.5), (53,8,2.5), (56,8,2.5), (63,8,2.5),  
-                        (39,10.5,1.5), (46,10.5,1.5), (55,10.5,1.5), (58,10.5,1.5), (63,10.5,1.5), 
-                        (41,12,2.5), (48,12,2.5), (56,12,2.5), (60,12,2.5), (63,12,2.5), 
-                        (39,14.5,1.5), (46,14.5,1.5), (55,14.5,1.5), (58,14.5,1.5), (63,14.5,1.5)]
-closerChordPos = [37, 39, 41, 44,46,48,53,55,56,58,60,63] #All possibly values, preferable sorted
-
-closerChords2 = [(37,0,1), (44,0,1), (53,0,1), (56,0,1), (63,0,1),
-                    (39,5,1), (46,5,1), (55,5,1), (58,5,1), (63,5,1),
-                    (39,6,1), (46,6,1), (55,6,1), (58,6,1), (63,6,1),
-                    (41,8,1), (48,8,1), (56,8,1), (60,8,1), (63,8,1), 
-                    (39,13,1), (46,13,1), (55,13,1), (58,13,1), (63,13,1),
-                    (39,14,1), (46,14,1), (55,14,1), (58,14,1), (63,14,1),
-                    (39,15,1), (46,15,1), (55,15,1), (58,15,1), (63,15,1)]
-closerChordPos2 = [37, 39, 41, 44, 46, 48, 53, 55, 56, 58, 60, 63]
-
-closerMelody = [(70,0,1), (72,1,1), (68,2,1), (70,3,1), 
-                (70,4,1), (72,5,1), (68,6,1), (70,7,1), 
-                (70,8,1), (72,9,1), (68,10,1), (70,11,1), 
-                (70,12,1), (68,13,1), (68,14,1), (70,15,1)]
-closerMelodyPos = [68,70,72]
-
-closerPerc = [(35,0,1), (35,1,1), (38,1,1), (44,1,1), (35,2.5,.5), (44,2.5,.5), (35,3,.5), (44,3,.5),
-                (35,4,1), (35,5,1), (38,5,1), (44,5,1), (35,6.5,.5), (44,6.5,.5), (35,7,.5), (44,7,.5),
-                (35,8,1), (35,9,1), (38,9,1), (44,9,1), (35,10.5,.5), (44,10.5,.5), (35,11,.5), (44,11,.5),
-                (35,12,1), (35,13,1), (38,13,1), (44,13,1), (35,14.5,.5), (44,14.5,.5), (35,15,.5), (44,15,.5)]
-closerPercPos = [35, 38, 44]
-
-compChanges2 = [(0, 16, [63,68,70,72,75])]
-compPitches2 = [63,68,70,72,75]
-
 chords = {
     "Chainsmokers": {
         1: {
@@ -118,27 +85,64 @@ tempos = {
     "Chainsmokers": 95*2
 }
 
-class Screen1(InstructionGroup):
+class StyleSelection(BoxLayout):
     def __init__(self, styleCallback):
-        super(Screen1, self).__init__()
-        w = Window.width
-        h = Window.height
-        padding = 50
+        super(StyleSelection, self).__init__()
+        
+        self.orientation = "vertical"
+        size = (1, .5)
 
-        halfHeight = (h - 4*padding) / 2
-        quarterHeight = halfHeight / 2
-
-        b1 = Button(text="Chainsmokers")
-        b1.bind(on_press=styleCallback("Chainsmokers"))
-        b1.size = (w - 2*padding, h - 2*padding)
-        b1.center = (w/2, halfHeight + quarterHeight)
+        b1 = Button(text="Chainsmokers", size_hint=size)
+        b1.bind(on_press=styleCallback)
         self.option1 = b1
-        self.add(self.option1)
+
+        b2 = Button(text="Fake", size_hint=size)
+        # b2.bind(on_press=styleCallback)
+        self.option2 = b2
+        
+        self.add_widget(self.option1)
+        self.add_widget(self.option2)
+
+class ChordSelection(BoxLayout):
+    def __init__(self, chordCallback):
+        super(ChordSelection, self).__init__()
+        
+        self.orientation = "vertical"
+        size = (1, .5)
+
+        b1 = Button(text="1", size_hint=size)
+        b1.bind(on_press=chordCallback)
+        self.option1 = b1
+
+        b2 = Button(text="2", size_hint=size)
+        b2.bind(on_press=chordCallback)
+        self.option2 = b2
+        
+        self.add_widget(self.option1)
+        self.add_widget(self.option2)
+
+class PercSelection(BoxLayout):
+    def __init__(self, percCallback):
+        super(PercSelection, self).__init__()
+        
+        self.orientation = "vertical"
+        size = (1, .5)
+
+        b1 = Button(text="1", size_hint=size)
+        b1.bind(on_press=percCallback)
+        self.option1 = b1
+
+        b2 = Button(text="Fake", size_hint=size)
+        b2.bind(on_press=percCallback)
+        self.option2 = b2
+        
+        self.add_widget(self.option1)
+        self.add_widget(self.option2)
 
 
-class Screen4(InstructionGroup):
+class MelodySelection(Widget):
     def __init__(self, synth, sched, chords, perc, melody):
-        super(Screen4, self).__init__()
+        super(MelodySelection, self).__init__()
         w = Window.width
         h = Window.height
         padding = 50
@@ -165,9 +169,9 @@ class Screen4(InstructionGroup):
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer = ComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), melody['changes'], melody['pitches'], 110)
 
-        self.add(self.botBPlayer)
-        self.add(self.midBPlayer)
-        self.add(self.compBPlayer)
+        self.canvas.add(self.botBPlayer)
+        self.canvas.add(self.midBPlayer)
+        self.canvas.add(self.compBPlayer)
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
@@ -213,17 +217,34 @@ class MainWidget(BaseWidget):
         self.metro = Metronome(self.sched, self.synth)
 
         # create the different screens
-        # self.screen1 = Screen1(self.update_style)
-        self.screen2 = None
-        self.screen3 = None
+        self.style_selection = StyleSelection(self.update_style)
+        self.chord_selection = ChordSelection(self.update_chords)
+        self.perc_selection = PercSelection(self.update_perc)
 
         # variables to store options
-        self.style = 'Chainsmokers'
-        self.chords = 2
-        self.perc = 1
-        self.melody = 1
+        self.style = None
+        self.chords = None
+        self.perc = None
+        self.melody = None
 
-        self.screen4 = Screen4(
+        self.melody_selection = None
+
+        self.active_screen = self.style_selection
+        self.add_widget(self.active_screen)
+
+    def update_style(self, instance):
+        self.style = instance.text
+        self.change_screens(self.chord_selection)
+
+    def update_chords(self, instance):
+        self.chords = int(instance.text)
+        self.change_screens(self.perc_selection)
+    
+    def update_perc(self, instance):
+        self.perc = int(instance.text)
+        self.remove_widget(self.active_screen)
+
+        self.melody_selection = MelodySelection(
             self.synth, 
             self.sched, 
             chords[self.style][2], 
@@ -231,17 +252,13 @@ class MainWidget(BaseWidget):
             melody[self.style][1]
             )
 
-        self.active_screen = self.screen4
-        self.canvas.add(self.active_screen)
+        self.active_screen = self.melody_selection
+        self.add_widget(self.active_screen)
 
-    def update_style(self, selection):
-        self.style = selection
-
-    def update_chords(self, selection):
-        self.chords = selection
-    
-    def update_perc(self, selection):
-        self.perc = selection
+    def change_screens(self, screen):
+        self.remove_widget(self.active_screen)
+        self.active_screen = screen
+        self.add_widget(self.active_screen)
 
     def on_touch_down(self, touch):
         self.active_screen.on_touch_down(touch)
@@ -251,7 +268,6 @@ class MainWidget(BaseWidget):
 
     def on_update(self):
         self.audio.on_update()
-        #self.objects.on_update()
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
