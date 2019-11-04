@@ -60,6 +60,9 @@ class ComposeBarPlayer(BarPlayer):
         # def __init__(self, sched, synth, channel, program, notes, velocity, loop=True, callback = None):
         self.noteSeq = NoteSequencer(self.sched, self.synth, self.channel, self.program, self.notes, self.velocity)
 
+        self.create_beat_bars()
+
+        '''
         leftRightPadding = 20
 
         xRange = self.width - 2*leftRightPadding #+ noteWidth
@@ -81,6 +84,7 @@ class ComposeBarPlayer(BarPlayer):
         bar = BeatBar((absoluteX, absoluteY), self.height)
         self.add(bar)
         self.beatBar.append(bar)
+        '''
 
 
     def play(self):
@@ -137,13 +141,13 @@ class ComposeBarPlayer(BarPlayer):
 
             bar = BeatBar((absoluteX, absoluteY), self.height)
             self.add(bar)
-            self.beatBar.append(bar)
+            self.beatBars.append(bar)
         relX = 16*sizePerBeat + startingBeat + 6
         absoluteX = relX + self.botLeft[0]
         absoluteY = self.botLeft[1]
         bar = BeatBar((absoluteX, absoluteY), self.height)
         self.add(bar)
-        self.beatBar.append(bar)        
+        self.beatBars.append(bar)        
     
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
@@ -168,6 +172,8 @@ class ComposeBarPlayer(BarPlayer):
         #recreate them
         self.display_note_graphics()
         self.create_beat_bars()
+        self.background.pos = self.botLeft
+        self.background.size = newSize
 
 
     def round_to_beat(self, raw, roundTo):
@@ -364,6 +370,9 @@ class StaticBarPlayer(BarPlayer):
         self.clear_note_graphics()
         #recreate them
         self.display_note_graphics()
+
+        self.background.pos = self.botLeft
+        self.background.size = newSize
 
     '''
     Clears the note graphics. Should be used when notes is changed
