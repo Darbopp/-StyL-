@@ -77,6 +77,10 @@ class NoteSequencer(object):
             self.stop()
         else:
             self.start()
+
+    def change_notes(self, newNotes):
+        self.stop()
+        self.notes = newNotes
     
     def _noteon(self, tick, ignore):
         #note: (pitch, startBeat, len)
