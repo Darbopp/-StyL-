@@ -17,6 +17,7 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.widget import Widget
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.floatlayout import FloatLayout
 from kivy.graphics.instructions import InstructionGroup
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
@@ -85,54 +86,54 @@ tempos = {
     "Chainsmokers": 95*2
 }
 
-class StyleSelection(BoxLayout):
+class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
         super(StyleSelection, self).__init__()
         
         self.orientation = "vertical"
-        size = (1, .5)
+        #size = (1, .5)
 
-        b1 = Button(text="Chainsmokers", size_hint=size)
+        b1 = Button(text="Chainsmokers", size = (500, 500), pos = (Window.width/2, Window.height/2))
         b1.bind(on_press=styleCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size_hint=size)
+        b2 = Button(text="Fake", size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
         # b2.bind(on_press=styleCallback)
         self.option2 = b2
         
         self.add_widget(self.option1)
         self.add_widget(self.option2)
 
-class ChordSelection(BoxLayout):
+class ChordSelection(FloatLayout):
     def __init__(self, chordCallback):
         super(ChordSelection, self).__init__()
         
         self.orientation = "vertical"
-        size = (1, .5)
+        size = (1, 1)
 
-        b1 = Button(text="1", size_hint=size)
+        b1 = Button(text="1", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2))
         b1.bind(on_press=chordCallback)
         self.option1 = b1
 
-        b2 = Button(text="2", size_hint=size)
+        b2 = Button(text="2", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
         b2.bind(on_press=chordCallback)
         self.option2 = b2
         
         self.add_widget(self.option1)
         self.add_widget(self.option2)
 
-class PercSelection(BoxLayout):
+class PercSelection(FloatLayout):
     def __init__(self, percCallback):
         super(PercSelection, self).__init__()
         
         self.orientation = "vertical"
-        size = (1, .5)
+        size = (1, 1)
 
-        b1 = Button(text="1", size_hint=size)
+        b1 = Button(text="1", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2))
         b1.bind(on_press=percCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size_hint=size)
+        b2 = Button(text="Fake", size_hint=size, size = (500, 500), pos = (Window.width/2, Window.height/2 - 200))
         b2.bind(on_press=percCallback)
         self.option2 = b2
         
