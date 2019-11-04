@@ -39,6 +39,8 @@ class ComposeBarPlayer(BarPlayer):
         self.graphicNotes = [] #list of all graphic notes so we can remove them if needed
         #a list of all the possible Pitches. Important to sort to get correct relative layout
         self.possiblePitches = sorted(allPitches)
+        self.beatBars = []
+
 
         self.changes = changes #[(startBeat, len, [allowed pitches])]
 
@@ -72,11 +74,13 @@ class ComposeBarPlayer(BarPlayer):
 
             bar = BeatBar((absoluteX, absoluteY), self.height)
             self.add(bar)
+            self.beatBar.append(bar)
         relX = 16*sizePerBeat + startingBeat + 6
         absoluteX = relX + self.botLeft[0]
         absoluteY = self.botLeft[1]
         bar = BeatBar((absoluteX, absoluteY), self.height)
         self.add(bar)
+        self.beatBar.append(bar)
 
 
     def play(self):
@@ -113,6 +117,33 @@ class ComposeBarPlayer(BarPlayer):
     def clear_note_graphics(self):
         for gNote in self.graphicNotes:
             self.remove(gNote)
+
+    def clear_beat_bars(self):
+        for bar in self.beatBars:
+            self.remove(bar)
+            
+    def create_beat_bars(self):
+        leftRightPadding = 20
+
+        xRange = self.width - 2*leftRightPadding #+ noteWidth
+
+        sizePerBeat = xRange / 16
+        startingBeat = 20
+
+        for i in range(17):
+            relX = i*sizePerBeat + startingBeat
+            absoluteX = relX + self.botLeft[0]
+            absoluteY = self.botLeft[1]
+
+            bar = BeatBar((absoluteX, absoluteY), self.height)
+            self.add(bar)
+            self.beatBar.append(bar)
+        relX = 16*sizePerBeat + startingBeat + 6
+        absoluteX = relX + self.botLeft[0]
+        absoluteY = self.botLeft[1]
+        bar = BeatBar((absoluteX, absoluteY), self.height)
+        self.add(bar)
+        self.beatBar.append(bar)        
     
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
@@ -124,6 +155,20 @@ class ComposeBarPlayer(BarPlayer):
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
     
+    def resize(self, newSize, botLeft):
+
+        self.botLeft = botLeft
+        self.width = newSize[0]
+        self.height = newSize[1]
+
+        #update the displays
+        self.clear_real_notes()
+        self.clear_note_graphics()
+        self.clear_beat_bars()
+        #recreate them
+        self.display_note_graphics()
+        self.create_beat_bars()
+
 
     def round_to_beat(self, raw, roundTo):
         return roundTo * round(raw/roundTo)
@@ -308,6 +353,17 @@ class StaticBarPlayer(BarPlayer):
 
     def set_pitches(self, newPitches):
         self.pitches = sorted(newPitches)
+
+    def resize(self, newSize, botLeft):
+
+        self.botLeft = botLeft
+        self.width = newSize[0]
+        self.height = newSize[1]
+
+        #update the displays
+        self.clear_note_graphics()
+        #recreate them
+        self.display_note_graphics()
 
     '''
     Clears the note graphics. Should be used when notes is changed
