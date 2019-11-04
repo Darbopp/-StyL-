@@ -176,6 +176,28 @@ class MelodySelection(Widget):
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
 
+    def on_layout(self, win_size):
+        w = win_size[0]
+        h = win_size[1]
+        padding = 50
+        halfHeight = (h - 4*padding) / 2
+        quarterHeight = halfHeight / 2
+        paddedWidth = w - 2*padding
+
+
+        botBarPlayerPos = (padding,padding)
+        botBarPlayerSize = (paddedWidth, quarterHeight)
+        #def resize(self, newSize, botLeft):
+        self.botBPlayer.resize(botBarPlayerSize, botBarPlayerPos)
+
+        midBarPlayerPos = (padding, 2*padding + quarterHeight)
+        midBarPlayerSize = (paddedWidth, quarterHeight)
+        self.midBPlayer.resize(midBarPlayerSize, midBarPlayerPos)
+
+        compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
+        compBarPlayerSize = (paddedWidth, halfHeight)
+        self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
+
     def on_key_down(self, keycode, modifiers):
         self.compBPlayer.on_key_down(keycode, modifiers)
         if keycode[1] == 'q':
@@ -254,6 +276,9 @@ class MainWidget(BaseWidget):
 
         self.active_screen = self.melody_selection
         self.add_widget(self.active_screen)
+
+    #def on_layout(self, win_size):
+        #self.active_screen.on_layout(win_size)
 
     def change_screens(self, screen):
         self.remove_widget(self.active_screen)
