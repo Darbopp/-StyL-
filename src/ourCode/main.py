@@ -22,7 +22,7 @@ from kivy.graphics.instructions import InstructionGroup
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
-from barPlayer import StaticBarPlayer, ComposeBarPlayer
+from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
 
 ##########################################
 #               Note Values              #
@@ -179,7 +179,7 @@ class MelodySelection(Widget):
         #def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, velocity):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
-        self.compBPlayer = ComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), melody['changes'], melody['pitches'], 110)
+        self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), melody['changes'], melody['pitches'], 110)
 
         self.canvas.add(self.botBPlayer)
         self.canvas.add(self.midBPlayer)
@@ -187,6 +187,9 @@ class MelodySelection(Widget):
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
+    
+    def on_touch_move(self, touch):
+        self.compBPlayer.on_touch_move(touch)
 
     def on_layout(self, win_size):
         w = win_size[0]
@@ -298,6 +301,9 @@ class MainWidget(BaseWidget):
 
     def on_touch_down(self, touch):
         self.active_screen.on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        self.active_screen.on_touch_move(touch)
     
     def on_key_down(self, keycode, modifiers):
         self.active_screen.on_key_down(keycode, modifiers)
