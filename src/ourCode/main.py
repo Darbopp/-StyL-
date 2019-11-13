@@ -23,6 +23,7 @@ from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
 from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
+from selectionButton import SelectionButton
 
 ##########################################
 #               Note Values              #
@@ -109,7 +110,7 @@ class StyleSelection(FloatLayout):
         self.add_widget(self.option2)
 
 class ChordSelection(FloatLayout):
-    def __init__(self, chordCallback):
+    def __init__(self, chordCallback, sched, synth, chord_options):
         super(ChordSelection, self).__init__()
         
         self.orientation = "vertical"
@@ -118,38 +119,95 @@ class ChordSelection(FloatLayout):
         self.label.text = "Select the chords you would like to use."
         self.add_widget(self.label)
 
-        b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
-        b1.bind(on_press=chordCallback)
-        self.option1 = b1
+        size = (300, 50)
+        channel = 1
+        program = (0,0)
+        velocity = 60
+        self.options = []
 
-        b2 = Button(text="2", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
-        b2.bind(on_press=chordCallback)
-        self.option2 = b2
-        
-        self.add_widget(self.option1)
-        self.add_widget(self.option2)
+        text1 = "1"
+        pos1 = (Window.width/2-150, Window.height/2)
+        notes = chord_options[1]["midi"]
+        b1 = SelectionButton(text1, size, pos1, chordCallback, sched, synth, channel, program, notes, velocity)
+        self.options.append(b1)
+        # b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        # b1.bind(on_press=chordCallback)
+        # self.option1 = b1
+
+        text2 = "2"
+        pos2 = (Window.width/2-150, Window.height/2 - 200)
+        notes = chord_options[2]["midi"]
+        b2 = SelectionButton(text2, size, pos2, chordCallback, sched, synth, channel, program, notes, velocity)
+        self.options.append(b2)
+        # b2 = Button(text="2", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
+        # b2.bind(on_press=chordCallback)
+        # self.option2 = b2
+
+        for option in self.options:
+            self.add_widget(option)
+    
+    def on_update(self, pos):
+        # self.label.text = "Select the chords you would like to use.\n"
+        # self.label.text += "Button 1: " + str(self.options[0].hovering) + "\n"
+        # self.label.text += "Button 2: " + str(self.options[1].hovering) + "\n"
+
+        for option in self.options:
+            option.on_update(pos)
+    
+    def on_touch_down(self, touch):
+        for option in self.options:
+            option.on_touch_down(touch)
 
 class PercSelection(FloatLayout):
-    def __init__(self, percCallback):
+    def __init__(self, percCallback, sched, synth, perc_options):
         super(PercSelection, self).__init__()
         
         self.orientation = "vertical"
-        size = (1, 1)
 
         self.label = topleft_label()
         self.label.text = "Select the percussion you would like to use."
         self.add_widget(self.label)
 
-        b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
-        b1.bind(on_press=percCallback)
-        self.option1 = b1
+        self.options = []
+        size = (300, 50)
+        channel = 2
+        program = (128,0)
+        velocity = 100
+
+        text1 = "1"
+        pos1 = (Window.width/2-150, Window.height/2)
+        notes = perc_options[1]["midi"]
+        b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity)
+        self.options.append(b1)
+
+        # text2 = "Fake"
+        # pos2 = (Window.width/2-150, Window.height/2 - 200)
+        # # notes = perc_options[2]["midi"]
+        # b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity)
+        # self.options.append(b2)
+
+        # b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        # b1.bind(on_press=percCallback)
+        # self.option1 = b1
 
         b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
         b2.bind(on_press=percCallback)
-        self.option2 = b2
+        self.options.append(b2)
         
-        self.add_widget(self.option1)
-        self.add_widget(self.option2)
+        for option in self.options:
+            self.add_widget(option)
+    
+    def on_update(self, pos):
+        # self.label.text = "Select the chords you would like to use.\n"
+        # self.label.text += "Button 1: " + str(self.options[0].hovering) + "\n"
+        # self.label.text += "Button 2: " + str(self.options[1].hovering) + "\n"
+
+        # for option in self.options:
+        #     option.on_update(pos)
+        self.options[0].on_update(pos)
+
+    def on_touch_down(self, touch):
+        self.options[0].on_touch_down(touch)
 
 
 class MelodySelection(Widget):
@@ -198,7 +256,6 @@ class MelodySelection(Widget):
         halfHeight = (h - 4*padding) / 2
         quarterHeight = halfHeight / 2
         paddedWidth = w - 2*padding
-
 
         botBarPlayerPos = (padding,padding)
         botBarPlayerSize = (paddedWidth, quarterHeight)
@@ -253,33 +310,35 @@ class MainWidget(BaseWidget):
         # create the metronome:
         self.metro = Metronome(self.sched, self.synth)
 
-        # create the different screens
-        self.style_selection = StyleSelection(self.update_style)
-        self.chord_selection = ChordSelection(self.update_chords)
-        self.perc_selection = PercSelection(self.update_perc)
-
         # variables to store options
         self.style = None
         self.chords = None
         self.perc = None
 
-        self.melody_selection = None
+        # variables to store screen options
+        self.style_selection = StyleSelection(self.update_style)    # screen index 0
+        self.chord_selection = None                                 # screen index 1
+        self.perc_selection = None                                  # screen index 2
+        self.melody_selection = None                                # screen index 3
 
         self.active_screen = self.style_selection
+        self.screen_index = 0
         self.add_widget(self.active_screen)
 
     def update_style(self, instance):
         self.style = instance.text
+        self.chord_selection = ChordSelection(self.update_chords, self.sched, self.synth, chords[self.style])
         self.change_screens(self.chord_selection)
+        self.screen_index = 1
 
     def update_chords(self, instance):
         self.chords = int(instance.text)
+        self.perc_selection = PercSelection(self.update_perc, self.sched, self.synth, percussion[self.style])
         self.change_screens(self.perc_selection)
+        self.screen_index = 2
     
     def update_perc(self, instance):
         self.perc = int(instance.text)
-        self.remove_widget(self.active_screen)
-
         self.melody_selection = MelodySelection(
             self.synth, 
             self.sched, 
@@ -288,8 +347,8 @@ class MainWidget(BaseWidget):
             melody[self.style][1]
             )
 
-        self.active_screen = self.melody_selection
-        self.add_widget(self.active_screen)
+        self.change_screens(self.melody_selection)
+        self.screen_index = 3
 
     #def on_layout(self, win_size):
         #self.active_screen.on_layout(win_size)
@@ -310,6 +369,14 @@ class MainWidget(BaseWidget):
 
     def on_update(self):
         self.audio.on_update()
+
+        # mouse over events
+        if self.screen_index == 1 or self.screen_index == 2:
+            # print(Window.mouse_pos)
+            self.active_screen.on_update(Window.mouse_pos[:2])
+            
+        # elif self.active_screen == self.perc_selection:
+        #     self.active_screen.on_update(Window.mouse_pos[:2])
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
