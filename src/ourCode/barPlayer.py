@@ -16,6 +16,25 @@ from noteSequencer import NoteSequencer
 
 import numpy as np
 
+def clr(pitch, alpha): 
+    red = 0
+    blue = 0
+    green = 0
+    if pitch in [5, 0, 7, 2, 10, 12]: 
+        red = 1
+    elif pitch == 9 or pitch == 3: 
+        red = 0.5
+    if pitch in [2, 9, 4, 11, 6]: 
+        green = 1
+    elif pitch == 7 or pitch == 1: 
+        green = 0.5
+    if pitch in [6, 1, 8, 3, 10]: 
+        blue = 1
+    if pitch == 11 or pitch == 5: 
+        blue = 0.5
+    return (red, green, blue, alpha)
+
+
 class BarPlayer(InstructionGroup) :
 
     def __init__(self, botLeft, size, sched, synth, channel=0, program=(0,40)):
@@ -164,9 +183,10 @@ class LineComposeBarPlayer(BarPlayer):
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
             beatAndPitch = (note[1], note[0])
+            color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2])
+            noteGraphic = NoteShape(absCoords, note[2], color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
@@ -523,9 +543,10 @@ class ComposeBarPlayer(BarPlayer):
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
             beatAndPitch = (note[1], note[0])
+            color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2])
+            noteGraphic = NoteShape(absCoords, note[2], color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
@@ -756,9 +777,10 @@ class StaticBarPlayer(BarPlayer):
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
             beatAndPitch = (note[1], note[0])
+            color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2])
+            noteGraphic = NoteShape(absCoords, note[2], color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)

@@ -12,7 +12,7 @@ from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
 
 class NoteShape(InstructionGroup):
-    def __init__(self, botLeftPos, noteLength, qNoteLength = 40):
+    def __init__(self, botLeftPos, noteLength, color = None, qNoteLength = 40):
         super(NoteShape, self).__init__()
 
         #noteLength passed in incase we want to change shape based on length
@@ -25,11 +25,15 @@ class NoteShape(InstructionGroup):
         leftX = botLeftPos[0]
         #botY = botLeftPos[1]
 
-        self.shape = Rectangle(pos = botLeftPos, size=(self.width, self.height))
+        self.shape = Ellipse(pos = botLeftPos, size=(self.width, self.height))
 
-        colorChange = leftX / w
-        hue = .6 + .5 * (colorChange) 
-        self.color = Color(hsv=(hue, 1, 1), a=1)
+        if not color: 
+            colorChange = leftX / w
+            hue = .6 + .5 * (colorChange) 
+            self.color = Color(hsv=(hue, 1, 1), a=0.5)
+
+        else: 
+            self.color = Color(*color)
 
         self.add(self.color)
         self.add(self.shape)
