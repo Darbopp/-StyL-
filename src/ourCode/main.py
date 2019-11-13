@@ -42,7 +42,7 @@ chords = {
                 (39,10.5,1.5), (46,10.5,1.5), (55,10.5,1.5), (58,10.5,1.5), (63,10.5,1.5), 
                 (41,12,2.5), (48,12,2.5), (56,12,2.5), (60,12,2.5), (63,12,2.5), 
                 (39,14.5,1.5), (46,14.5,1.5), (55,14.5,1.5), (58,14.5,1.5), (63,14.5,1.5)
-                ],
+            ],
             "pitches": [37, 39, 41, 44, 46, 48, 53, 55, 56, 58, 60, 63]
         },
         2: {
@@ -54,7 +54,7 @@ chords = {
                 (39,13,1), (46,13,1), (55,13,1), (58,13,1), (63,13,1),
                 (39,14,1), (46,14,1), (55,14,1), (58,14,1), (63,14,1),
                 (39,15,1), (46,15,1), (55,15,1), (58,15,1), (63,15,1)
-                ],
+            ],
             "pitches": [37, 39, 41, 44, 46, 48, 53, 55, 56, 58, 60, 63]
         }
     }
@@ -68,8 +68,15 @@ percussion = {
                 (35,4,1), (35,5,1), (38,5,1), (44,5,1), (35,6.5,.5), (44,6.5,.5), (35,7,.5), (44,7,.5),
                 (35,8,1), (35,9,1), (38,9,1), (44,9,1), (35,10.5,.5), (44,10.5,.5), (35,11,.5), (44,11,.5),
                 (35,12,1), (35,13,1), (38,13,1), (44,13,1), (35,14.5,.5), (44,14.5,.5), (35,15,.5), (44,15,.5)
-                ],
+            ],
             "pitches": [35, 38, 44]
+        },
+        2: {
+            "midi" : [
+                (36,0,1), (36,1,1), (38,2,2), (36,4,1), (36,5,1), (36,5.5,.5), (38,6,1), (38,7,1),
+                (36,8,1), (36,9,1), (38,10,2), (36,12,1), (36,13,1), (36,13.5,.5), (38,14,1), (38,15,1),
+            ],
+            "pitches": [36, 38, 52]
         }
     }
 }
@@ -180,19 +187,19 @@ class PercSelection(FloatLayout):
         b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity)
         self.options.append(b1)
 
-        # text2 = "Fake"
-        # pos2 = (Window.width/2-150, Window.height/2 - 200)
-        # # notes = perc_options[2]["midi"]
-        # b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity)
-        # self.options.append(b2)
-
-        # b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
-        # b1.bind(on_press=percCallback)
-        # self.option1 = b1
-
-        b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
-        b2.bind(on_press=percCallback)
+        text2 = "2"
+        pos2 = (Window.width/2-150, Window.height/2 - 200)
+        notes = perc_options[2]["midi"]
+        b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity)
         self.options.append(b2)
+
+        # # b1 = Button(text="1", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        # # b1.bind(on_press=percCallback)
+        # # self.option1 = b1
+
+        # b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
+        # b2.bind(on_press=percCallback)
+        # self.options.append(b2)
         
         for option in self.options:
             self.add_widget(option)
@@ -202,12 +209,14 @@ class PercSelection(FloatLayout):
         # self.label.text += "Button 1: " + str(self.options[0].hovering) + "\n"
         # self.label.text += "Button 2: " + str(self.options[1].hovering) + "\n"
 
-        # for option in self.options:
-        #     option.on_update(pos)
-        self.options[0].on_update(pos)
+        for option in self.options:
+            option.on_update(pos)
+        # self.options[0].on_update(pos)
 
     def on_touch_down(self, touch):
-        self.options[0].on_touch_down(touch)
+        for option in self.options:
+            option.on_touch_down(touch)
+        # self.options[0].on_touch_down(touch)
 
 
 class MelodySelection(Widget):
