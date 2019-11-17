@@ -1,4 +1,5 @@
 src/data
-src/data/__pychache__
+src/data/__pycache__
+src/ourCode/__pycache__
 
 *.sf2
