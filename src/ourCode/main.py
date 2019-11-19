@@ -1,4 +1,3 @@
-
 import sys
 sys.path.append('..')
 from common.core import BaseWidget, run, lookup
@@ -25,7 +24,7 @@ from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
 from selectionButton import SelectionButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
-
+from nowBar import NowBar
 '''
 chords = {
     "Chainsmokers": {
@@ -93,6 +92,7 @@ tempos = {
 }
 '''
 
+
 class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
         super(StyleSelection, self).__init__()
@@ -102,7 +102,6 @@ class StyleSelection(FloatLayout):
         self.add_widget(self.label)
 
         self.orientation = "vertical"
-        #size = (1, .5)
 
         b1 = Button(text="Chainsmokers", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
         b1.bind(on_press=styleCallback)
@@ -247,14 +246,22 @@ class MelodySelection(Widget):
         quarterHeight = halfHeight / 2
         paddedWidth = w - 2*padding
 
+        # Now Bar Speed Calculation
+        now_bar_padding = 20
+        length = paddedWidth - 2*now_bar_padding
+        num_beats = 16
+        self.speed = length / num_beats * 95*2 / 60
+
         botBarPlayerPos = (padding,padding)
         botBarPlayerSize = (paddedWidth, quarterHeight)
         #def __init__(self, botLeft, size, sched, synth, channel, program, notes, posPitches, velocity):
         self.botBPlayer = StaticBarPlayer(botBarPlayerPos, botBarPlayerSize, self.sched, self.synth, 2, (128,0), perc['midi'], perc['pitches'], 100)
+        self.botBNowBar = NowBar(botBarPlayerPos, botBarPlayerSize, now_bar_padding, self.speed)
 
         midBarPlayerPos = (padding, 2*padding + quarterHeight)
         midBarPlayerSize = (paddedWidth, quarterHeight)
         self.midBPlayer = StaticBarPlayer(midBarPlayerPos, midBarPlayerSize, self.sched, self.synth, 1, (0,0), chords['midi'], chords['pitches'], 60)
+        self.midBNowBar = NowBar(midBarPlayerPos, midBarPlayerSize, now_bar_padding, self.speed)
 
 
         changesAndNotes = chords_to_changes(chords)
@@ -266,10 +273,14 @@ class MelodySelection(Widget):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110)
+        self.compBNowBar = NowBar(compBarPlayerPos, compBarPlayerSize, now_bar_padding, self.speed)
 
-        self.canvas.add(self.botBPlayer)
-        self.canvas.add(self.midBPlayer)
-        self.canvas.add(self.compBPlayer)
+        self.barPlayers = [self.botBPlayer, self.midBPlayer, self.compBPlayer]
+        self.nowBars = [self.botBNowBar, self.midBNowBar, self.compBNowBar]
+        self.objects = self.barPlayers + self.nowBars
+
+        for obj in self.objects:
+            self.canvas.add(obj)
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
@@ -301,13 +312,11 @@ class MelodySelection(Widget):
     def on_key_down(self, keycode, modifiers):
         self.compBPlayer.on_key_down(keycode, modifiers)
         if keycode[1] == 'q':
-            self.midBPlayer.play()
-            self.botBPlayer.play()
-            self.compBPlayer.play()
+            for obj in self.objects:
+                obj.play()
         elif keycode[1] == 'e':
-            self.midBPlayer.toggle()
-            self.botBPlayer.toggle()
-            self.compBPlayer.toggle()
+            for obj in self.objects:
+                obj.toggle()
         elif keycode[1] == 'z':
             self.botBPlayer.clear_note_graphics()
         elif keycode[1] == 'x':
@@ -316,8 +325,12 @@ class MelodySelection(Widget):
             self.compBPlayer.process()
         elif keycode[1] == 's':
             self.compBPlayer.clear_raw_notes()
-    def on_update(self):
-        self.audio.on_update()
+    def on_update(self):     
+        for obj in self.nowBars:
+            obj.on_update()  
+        # self.botBNowBar.on_update()
+        # self.midBNowBar.on_update()
+        # self.compBNowBar.on_update()
 
 class MainWidget(BaseWidget):
     def __init__(self):
@@ -431,6 +444,10 @@ class MainWidget(BaseWidget):
         if self.screen_index == 2 or self.screen_index == 3:
             # print(Window.mouse_pos)
             self.active_screen.on_update(Window.mouse_pos[:2])
+        
+        if self.screen_index == 4:
+            # melody selection
+            self.active_screen.on_update()
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
