@@ -53,12 +53,24 @@ base_percussion = {
         }
     }
 }
-
+'''
 base_melody = {
     "Chainsmokers": {
         1: {
             "changes": [(0, 16, [63,68,70,72,75])],
             "pitches": [63,68,70,72,75]
+        }
+    }
+}
+A-flat major
+68,70,72,73,75,77,79,80
+56,58,60,61,63,65,67,68
+'''
+base_melody = {
+    "Chainsmokers": {
+        1: {
+            "changes": [(0, 16, [63,68,70,72,75])],
+            "pitches": [56,58,60,61,63,65,67,68]
         }
     }
 }
@@ -106,3 +118,32 @@ def transpose_melody(style, option, transposition):
         "changes": changes,
         "pitches": pitches
     }
+
+def chords_to_changes(chords):
+    data = chords["midi"] #[(pitch, startBeat, len)]
+    output = [] #[(startBeat, len, [allowed pitches])]
+    currentStartBeat = None
+    allNotes = []
+    for note in data:
+        if note[0] not in allNotes:
+            allNotes.append(note[0])
+        if currentStartBeat == None:
+            currentStartBeat = note[1]
+            output.append((note[1], note[2], []))
+        if note[1] == currentStartBeat:
+            if note[0] not in output[-1][2]:
+                output[-1][2].append(note[0])
+        else:
+            currentStartBeat = note[1]
+            output.append((note[1], note[2], [note[0]]))
+    print("CHORD TO CHANGES output: ",output)
+    return (output, allNotes)
+
+def combine_changes_and_scale(changeNotes, scaleNotes):
+    changeSet = set(changeNotes)
+    scaleSet = set(scaleNotes)
+
+    combinedSet = changeSet | scaleSet
+    combinedList = list(combinedSet)
+    combinedList.sort()
+    return combinedList

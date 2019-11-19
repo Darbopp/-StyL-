@@ -24,7 +24,7 @@ from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
 from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
 from selectionButton import SelectionButton
-from notes import transpose_instrument, transpose_melody
+from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 
 '''
 chords = {
@@ -256,10 +256,16 @@ class MelodySelection(Widget):
         midBarPlayerSize = (paddedWidth, quarterHeight)
         self.midBPlayer = StaticBarPlayer(midBarPlayerPos, midBarPlayerSize, self.sched, self.synth, 1, (0,0), chords['midi'], chords['pitches'], 60)
 
+
+        changesAndNotes = chords_to_changes(chords)
+        changes = changesAndNotes[0]
+        changeNotes = changesAndNotes[1]
+        scaleNotes = melody['pitches']
+        combinedNotes = combine_changes_and_scale(changeNotes, scaleNotes)
         #def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, velocity):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
-        self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), melody['changes'], melody['pitches'], 110)
+        self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110)
 
         self.canvas.add(self.botBPlayer)
         self.canvas.add(self.midBPlayer)

@@ -14,6 +14,8 @@ from kivy.graphics.instructions import InstructionGroup
 
 from noteSequencer import NoteSequencer
 
+from rules import DownBeatChordToneRule
+
 import numpy as np
 
 def clr(pitch, alpha): 
@@ -52,7 +54,7 @@ class BarPlayer(InstructionGroup) :
         self.height = size[1]
 
 class LineComposeBarPlayer(BarPlayer):
-    def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, velocity):
+    def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, scaleNotes, velocity):
         super(LineComposeBarPlayer, self).__init__(botLeft, size, sched, synth, channel, program)
 
         self.rawNotes = [] #[(relX, relY, len)]
@@ -60,6 +62,7 @@ class LineComposeBarPlayer(BarPlayer):
         self.graphicNotes = [] #list of all graphic notes so we can remove them if needed
         #a list of all the possible Pitches. Important to sort to get correct relative layout
         self.possiblePitches = sorted(allPitches)
+        self.scaleNotes = sorted(scaleNotes)
         self.beatBars = []
         
         
@@ -124,7 +127,9 @@ class LineComposeBarPlayer(BarPlayer):
 
     def process(self):
         self.clear_note_graphics()
-        self.raw_to_notes()
+        self.resample_lines()
+        self.lines_to_notes()
+        #self.raw_to_notes()
         self.display_note_graphics()
         self.noteSeq.change_notes(self.notes)
 
@@ -132,7 +137,7 @@ class LineComposeBarPlayer(BarPlayer):
         self.notes = newNotes
 
     def set_pitches(self, newPitches):
-        self.pitches = sorted(newPitches)
+        self.possiblePitches = sorted(newPitches)
 
     def clear_raw_notes(self):
         self.rawNotes = []
@@ -207,48 +212,21 @@ class LineComposeBarPlayer(BarPlayer):
         self.background.pos = self.botLeft
         self.background.size = newSize
 
-
+    #rounds raw to the nearest roundTo
     def round_to_beat(self, raw, roundTo):
         return roundTo * round(raw/roundTo)
 
-    def pick_pitch(self, snappedX, rawY, height):
-        #find right changes
-        #[(startBeat, len, [allowed pitches])]
+
+
+    def first_round_pick_pitch(self, snappedX, rawY, height):
         def get_startBeat(elem):
             return elem[0]
-
-        self.changes.sort(key=get_startBeat)
-
-        pitch = None
-
-        for index, change in enumerate(self.changes):
-            if index == len(self.changes) -1:
-                numBuckets = len(change[2])
-                sizePerBucket = height/numBuckets
-
-                noteBucket = int(rawY//sizePerBucket)
-                '''
-                print("Changes: ", change[2])
-                print("numBuckets: ", numBuckets)
-                print("height: ", height)
-                print("rawY: ", rawY)
-                print("sizePerBucket: ", sizePerBucket)
-                print("noteBucket: ", noteBucket)
-                '''
-
-                pitch = change[2][noteBucket]
-            else:
-                if snappedX >= change[0] and snappedX < self.changes[index+1][0]:
-                    #use this change
-                    numBuckets = len(change[2])
-                    sizePerBucket = height/numBuckets
-
-                    noteBucket = int(rawY//sizePerBucket)
-
-                    pitch = change[2][noteBucket]
-        if pitch == None:
-            print("why is pitch none?")
         
+        numBuckets = len(self.scaleNotes)
+        sizePerBucket = height/numBuckets
+        noteBucket = int(rawY // sizePerBucket)
+        pitch = self.scaleNotes[noteBucket]
+
         return pitch
 
     def resample_lines(self):
@@ -274,7 +252,7 @@ class LineComposeBarPlayer(BarPlayer):
         self.add(Color(1,.5,.2))
         #discretize plot
         self.clear_lines()
-        threshold = 10
+        threshold = 15 #difference in Y that gets absorbed
         lastYVal = None
         for index,yVal in enumerate(outY):
             xVal = outX[index]
@@ -305,50 +283,93 @@ class LineComposeBarPlayer(BarPlayer):
         '''
 
 
-    def raw_to_notes(self):
-        #self.rawNotes = [] #[(relX, relY, len)]
-        #self.notes = [] #[(pitch, startBeat, len)]  len is on the -4,-2,-1,-.5,0,.5,1,2,4 scale, negative numbers are rests
+    def lines_to_notes(self):
         leftRightPadding = 20
         topBottomPadding = 10
         numBeats = 4*4
-        noteHeight = self.qNoteWidth #added to take into account the height when determining ranges
-        noteWidth = self.qNoteWidth # added to take into account the width when determining ranges
+        noteHeight = self.qNoteWidth
+        noteWidth = self.qNoteWidth
 
-        xRange = self.width - 2*leftRightPadding #+ noteWidth
-        yRange = self.height - 2*topBottomPadding #- noteHeight
+        xRange = self.width - 2*leftRightPadding
+        yRange = self.height - 2*topBottomPadding
 
         sizePerBeat = xRange / numBeats
         sizePerEigth = sizePerBeat / 2
-        print("sizePerEigth: ",sizePerEigth)
         startingBeat = 20
 
-        for index, rawNote in enumerate(self.rawNotes):
-
-            boundedX = max(min(rawNote[0],self.width-2*leftRightPadding), leftRightPadding)
-            boundedY = max(min(rawNote[1],self.height-2*topBottomPadding), topBottomPadding)
+        for index, rawLine in enumerate(self.lines):
             '''
-            print("Width: ", self.width)
-            print("Height: ", self.height)
-            print("rawX: ", rawNote[0])
-            print("boundedX: ", boundedX)
-            print("rawY: ", rawNote[1])
-            print("boundedY: ", boundedY)
-            print("sizePerEigth: ",sizePerEigth)
+            beginX = rawLine.points[0]
+            beginY = rawLine.points[1]
+            endX = rawLine.points[-2]
+            endY = rawLine.points[-1]
             '''
-            eigthSnappedX = self.round_to_beat(boundedX - 10, sizePerEigth) - leftRightPadding
-            print("snappedX: ", eigthSnappedX)
-            pitch = self.pick_pitch(eigthSnappedX, boundedY-topBottomPadding, yRange)
 
-            snappedBeat = self.round_to_beat(eigthSnappedX/sizePerBeat, .5)
-            print("snappedBeat")
+            #print("Raw Y: ", rawLine.points[1]-self.botLeft[1])
+            #print("First round Y: ", min(rawLine.points[1],self.height-2*topBottomPadding))
+            #print("Second round Y: ", max(min(rawLine.points[1],self.height-2*topBottomPadding), topBottomPadding))
 
-            snappedNote = (pitch, snappedBeat, rawNote[2])
-            self.notes.append(snappedNote)
+            beginX = max(min(rawLine.points[0]-sizePerBeat,self.width-2*leftRightPadding), leftRightPadding) -10
+            beginY = max(min(rawLine.points[1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+            endX = max(min(rawLine.points[-2]-sizePerBeat,self.width), leftRightPadding) -10
+            endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
 
+            eigthBeginX = self.round_to_beat(beginX, sizePerEigth) -10 #- leftRightPadding
+            eigthEndX = self.round_to_beat(endX, sizePerEigth) -10 #- leftRightPadding
 
+            pitch = self.first_round_pick_pitch(eigthBeginX, beginY-topBottomPadding, yRange)
+
+            #noteLength = (self.round_to_beat(eigthEndX - eigthBeginX, sizePerEigth))/(2*sizePerEigth)
+            noteLength = (self.round_to_beat(endX - beginX, sizePerEigth))/(2*sizePerEigth)
+
+            #snappedBeginBeat = self.round_to_beat(eigthBeginX/sizePerBeat, .5)
+            #snappedBeginBeat = self.round_to_beat(beginX/sizePerBeat, .5)
+            snappedBeginBeat = eigthBeginX / (2*sizePerEigth)
+            snappedBeginBeat = self.round_to_beat(snappedBeginBeat, .5)
+
+            snappedNote = (pitch, snappedBeginBeat-.5, noteLength)
+            #print("beginX: ", beginX)
+            #print("endX: ", endX)
+            #print("beginY: ", beginY)
+            #print("eigthBeginX: ", eigthBeginX)
+            #print("eigthEndX: ", eigthEndX)
+            #print("sizePerBeat: ",sizePerBeat)
+            #print("noteLength: ", noteLength)
+            #print("snappedBeginBeat: ", snappedBeginBeat)
+            #print("")
+
+            if noteLength > 0:
+                self.notes.append(snappedNote)
+        
         print("notes: ", self.notes)
 
 
+
+    def apply_rules(self):
+        rule1 = DownBeatChordToneRule(self.notes, self.changes)
+
+        def note_startBeat(elem):
+            return elem[1]
+        
+        self.notes.sort(key=note_startBeat)
+        print("notes in apply: ", self.notes)
+
+        for i in range(len(self.notes)):
+            oldPitch = self.notes[i][0]
+            newPitch = rule1.new_note(i)
+            if oldPitch != newPitch:
+                print("ITS HAPPENING AT INDEX: ", i)
+                print("oldPitch: ", oldPitch)
+                print("newPitch: ", newPitch)
+                newNote = ( newPitch, self.notes[i][1], self.notes[i][2])
+                #self.notes[i][1] = newPitch
+                self.notes[i] = newNote
+
+        print("notes after rule: ", self.notes)
+        print("changes: ", self.changes)
+        
+
+  
     
     '''
     Given any screen coordinate, return that coordinate realtive to me
@@ -394,6 +415,15 @@ class LineComposeBarPlayer(BarPlayer):
             self.clear_lines()
         if keycode[1] == 'v':
             self.resample_lines()
+        if keycode[1] == 'b':
+            self.lines_to_notes()
+            self.display_note_graphics()
+        if keycode[1] == 'n':
+            self.clear_note_graphics()
+            print("In keycode n")
+            self.apply_rules()
+            self.noteSeq.change_notes(self.notes)
+            self.display_note_graphics()
 
     '''
     Determines where the note should be in relative coords based on what beat the note starts on and the midiPitch
