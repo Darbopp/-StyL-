@@ -25,73 +25,6 @@ from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
 from selectionButton import SelectionButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 from nowBar import NowBar
-'''
-chords = {
-    "Chainsmokers": {
-        1: {
-            "midi" : [
-                (37,0,2.5), (44,0,2.5), (53,0,2.5), (56,0,2.5), (63,0,2.5),  
-                (39,2.5,1.5), (46,2.5,1.5), (55,2.5,1.5), (58,2.5,1.5), (63,2.5,1.5), 
-                (41,4,2.5), (48,4,2.5), (56,4,2.5), (60,4,2.5), (63,4,2.5), 
-                (39,6.5,1.5), (46,6.5,1.5), (55,6.5,1.5), (58,6.5,1.5), (63,6.5,1.5),
-
-                (37,8,2.5), (44,8,2.5), (53,8,2.5), (56,8,2.5), (63,8,2.5),  
-                (39,10.5,1.5), (46,10.5,1.5), (55,10.5,1.5), (58,10.5,1.5), (63,10.5,1.5), 
-                (41,12,2.5), (48,12,2.5), (56,12,2.5), (60,12,2.5), (63,12,2.5), 
-                (39,14.5,1.5), (46,14.5,1.5), (55,14.5,1.5), (58,14.5,1.5), (63,14.5,1.5)
-            ],
-            "pitches": [37, 39, 41, 44, 46, 48, 53, 55, 56, 58, 60, 63]
-        },
-        2: {
-            "midi" : [
-                (37,0,1), (44,0,1), (53,0,1), (56,0,1), (63,0,1),
-                (39,5,1), (46,5,1), (55,5,1), (58,5,1), (63,5,1),
-                (39,6,1), (46,6,1), (55,6,1), (58,6,1), (63,6,1),
-                (41,8,1), (48,8,1), (56,8,1), (60,8,1), (63,8,1), 
-                (39,13,1), (46,13,1), (55,13,1), (58,13,1), (63,13,1),
-                (39,14,1), (46,14,1), (55,14,1), (58,14,1), (63,14,1),
-                (39,15,1), (46,15,1), (55,15,1), (58,15,1), (63,15,1)
-            ],
-            "pitches": [37, 39, 41, 44, 46, 48, 53, 55, 56, 58, 60, 63]
-        }
-    }
-}
-
-percussion = {
-    "Chainsmokers": {
-        1: {
-            "midi" : [
-                (35,0,1), (35,1,1), (38,1,1), (44,1,1), (35,2.5,.5), (44,2.5,.5), (35,3,.5), (44,3,.5),
-                (35,4,1), (35,5,1), (38,5,1), (44,5,1), (35,6.5,.5), (44,6.5,.5), (35,7,.5), (44,7,.5),
-                (35,8,1), (35,9,1), (38,9,1), (44,9,1), (35,10.5,.5), (44,10.5,.5), (35,11,.5), (44,11,.5),
-                (35,12,1), (35,13,1), (38,13,1), (44,13,1), (35,14.5,.5), (44,14.5,.5), (35,15,.5), (44,15,.5)
-            ],
-            "pitches": [35, 38, 44]
-        },
-        2: {
-            "midi" : [
-                (36,0,1), (36,1,1), (38,2,2), (36,4,1), (36,5,1), (36,5.5,.5), (38,6,1), (38,7,1),
-                (36,8,1), (36,9,1), (38,10,2), (36,12,1), (36,13,1), (36,13.5,.5), (38,14,1), (38,15,1),
-            ],
-            "pitches": [36, 38, 52]
-        }
-    }
-}
-
-melody = {
-    "Chainsmokers": {
-        1: {
-            "changes": [(0, 16, [63,68,70,72,75])],
-            "pitches": [63,68,70,72,75]
-        }
-    }
-}
-
-tempos = {
-    "Chainsmokers": 95*2
-}
-'''
-
 
 class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
@@ -113,6 +46,15 @@ class StyleSelection(FloatLayout):
         
         self.add_widget(self.option1)
         self.add_widget(self.option2)
+
+    def on_update(self):
+        return
+
+    def on_touch_move(self, touch):
+        pass
+
+    def on_key_down(self, keycode, modifiers):
+        pass
 
 class KeySelection(FloatLayout):
     def __init__(self, transposeCallback):
@@ -153,6 +95,15 @@ class KeySelection(FloatLayout):
         self.add_widget(b6)
         self.add_widget(b7)
 
+    def on_update(self):
+        pass
+
+    def on_touch_move(self, touch):
+        pass
+
+    def on_key_down(self, keycode, modifiers):
+        pass
+
 class ChordSelection(FloatLayout):
     def __init__(self, chordCallback, sched, synth, chord_options):
         super(ChordSelection, self).__init__()
@@ -184,13 +135,20 @@ class ChordSelection(FloatLayout):
         for option in self.options:
             self.add_widget(option)
     
-    def on_update(self, pos):
+    def on_update(self):
+        pos = Window.mouse_pos
         for option in self.options:
             option.on_update(pos)
     
     def on_touch_down(self, touch):
         for option in self.options:
             option.on_touch_down(touch)
+
+    def on_touch_move(self, touch):
+        pass
+
+    def on_key_down(self, keycode, modifiers):
+        pass
 
 class PercSelection(FloatLayout):
     def __init__(self, percCallback, sched, synth, perc_options):
@@ -223,7 +181,8 @@ class PercSelection(FloatLayout):
         for option in self.options:
             self.add_widget(option)
     
-    def on_update(self, pos):
+    def on_update(self):
+        pos = Window.mouse_pos
         for option in self.options:
             option.on_update(pos)
 
@@ -231,8 +190,14 @@ class PercSelection(FloatLayout):
         for option in self.options:
             option.on_touch_down(touch)
 
+    def on_touch_move(self, touch):
+        pass
+
+    def on_key_down(self, keycode, modifiers):
+        pass
+        
 class MelodySelection(Widget):
-    def __init__(self, synth, sched, chords, perc, melody):
+    def __init__(self, synth, sched, chords, perc, melody, change_key, change_chord, change_perc):
         super(MelodySelection, self).__init__()
         w = Window.width
         h = Window.height
@@ -243,7 +208,7 @@ class MelodySelection(Widget):
         self.sched = sched
 
         halfHeight = (h - 4*padding) / 2
-        quarterHeight = halfHeight / 2
+        quarterHeight = halfHeight / 3
         paddedWidth = w - 2*padding
 
         # Now Bar Speed Calculation
@@ -263,7 +228,6 @@ class MelodySelection(Widget):
         self.midBPlayer = StaticBarPlayer(midBarPlayerPos, midBarPlayerSize, self.sched, self.synth, 1, (0,0), chords['midi'], chords['pitches'], 60)
         self.midBNowBar = NowBar(midBarPlayerPos, midBarPlayerSize, now_bar_padding, self.speed)
 
-
         changesAndNotes = chords_to_changes(chords)
         changes = changesAndNotes[0]
         changeNotes = changesAndNotes[1]
@@ -281,6 +245,30 @@ class MelodySelection(Widget):
 
         for obj in self.objects:
             self.canvas.add(obj)
+            
+
+        dist_between = 75
+        b1 = Button(text="A", size_hint = (None, None), size = (50, 50), pos = (padding/2, Window.height - 1.5*padding))
+        b2 = Button(text="B", size_hint = (None, None), size = (50, 50), pos = (padding/2 + dist_between, Window.height - 1.5*padding))
+        b3 = Button(text="C", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 2*dist_between, Window.height - 1.5*padding))
+        b4 = Button(text="D", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 3*dist_between, Window.height - 1.5*padding))
+        b5 = Button(text="E", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 4*dist_between, Window.height - 1.5*padding))
+        b6 = Button(text="F", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 5*dist_between, Window.height - 1.5*padding))
+        b7 = Button(text="G", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 6*dist_between, Window.height - 1.5*padding))
+
+        self.keybuttons = [b1, b2, b3, b4, b5, b6, b7]
+        for button in self.keybuttons:
+            button.bind(on_press=change_key)
+
+        b8 = Button(text="Change Chord", size_hint = (None, None), size = (100, 50), pos = (padding/2 + 7*dist_between, Window.height - 1.5*padding))
+        b8.bind(on_press=change_chord)
+        
+        b9 = Button(text="Change Perc", size_hint = (None, None), size = (100, 50), pos = (9*dist_between, Window.height - 1.5*padding))
+        b9.bind(on_press=change_perc)
+
+        self.buttons = self.keybuttons + [b8, b9]
+        for button in self.buttons:
+            self.add_widget(button)
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
@@ -325,12 +313,21 @@ class MelodySelection(Widget):
             self.compBPlayer.process()
         elif keycode[1] == 's':
             self.compBPlayer.clear_raw_notes()
+
     def on_update(self):     
         for obj in self.nowBars:
             obj.on_update()  
-        # self.botBNowBar.on_update()
-        # self.midBNowBar.on_update()
-        # self.compBNowBar.on_update()
+
+
+key_to_transpose = {
+            "A": -3,
+            "B": -1,
+            "C": 0,
+            "D": 2,
+            "E": 4,
+            "F": 5,
+            "G": 7
+        }
 
 class MainWidget(BaseWidget):
     def __init__(self):
@@ -360,8 +357,8 @@ class MainWidget(BaseWidget):
         self.perc_option = None
 
         # variables to store screen options
-        self.style_selection = StyleSelection(self.update_style)    # screen index 0
-        self.key_selection = KeySelection(self.update_key)          # screen index 1
+        self.style_selection = StyleSelection(self.update_style_screen)    # screen index 0
+        self.key_selection = KeySelection(self.update_key_screen)          # screen index 1
         self.chord_selection = None                                 # screen index 2
         self.perc_selection = None                                  # screen index 3
         self.melody_selection = None                                # screen index 4
@@ -370,43 +367,34 @@ class MainWidget(BaseWidget):
         self.screen_index = 0
         self.add_widget(self.active_screen)
 
-    def update_style(self, instance):
+    def update_style_screen(self, instance):
         self.style = instance.text
 
         self.change_screens(self.key_selection)
         self.screen_index = 1
 
-    def update_key(self, instance):
-        key_to_transpose = {
-            "A": -3,
-            "B": -1,
-            "C": 0,
-            "D": 2,
-            "E": 4,
-            "F": 5,
-            "G": 7
-        }
+    def update_key_screen(self, instance):
         self.transposition = key_to_transpose[instance.text]
 
         # can now set up melody, chord, percussion settings
         self.melody = transpose_melody(self.style, 1, self.transposition)
 
         self.chords = transpose_instrument(self.style, "chords", self.transposition)
-        self.chord_selection = ChordSelection(self.update_chords, self.sched, self.synth, self.chords)
+        self.chord_selection = ChordSelection(self.update_chord_screen, self.sched, self.synth, self.chords)
 
         self.perc = transpose_instrument(self.style, "percussion", 0)
-        self.perc_selection = PercSelection(self.update_perc, self.sched, self.synth, self.perc)
+        self.perc_selection = PercSelection(self.update_perc_screen, self.sched, self.synth, self.perc)
 
         self.change_screens(self.chord_selection)
         self.screen_index = 2
 
-    def update_chords(self, option):
+    def update_chord_screen(self, option):
         self.chord_option = option
 
         self.change_screens(self.perc_selection)
         self.screen_index = 3
     
-    def update_perc(self, option):
+    def update_perc_screen(self, option):
         self.perc_option = option
 
         # can now update our composition screen
@@ -415,11 +403,75 @@ class MainWidget(BaseWidget):
             self.sched, 
             self.chords[self.chord_option], 
             self.perc[self.perc_option],
-            self.melody
+            self.melody,
+            self.change_key_button,
+            self.change_chord_button,
+            self.change_perc_button
             )
         self.change_screens(self.melody_selection)
         self.screen_index = 4
 
+    def change_key_button(self, instance):
+        print("Key is changing to " + instance.text)
+        self.transposition = key_to_transpose[instance.text]
+        self.melody = transpose_melody(self.style, 1, self.transposition)
+        self.chords = transpose_instrument(self.style, "chords", self.transposition)
+
+        self.remove_widget(self.melody_selection)
+        self.melody_selection = MelodySelection(
+            self.synth, 
+            self.sched, 
+            self.chords[self.chord_option], 
+            self.perc[self.perc_option],
+            self.melody,
+            self.change_key_button,
+            self.change_chord_button,
+            self.change_perc_button
+            )
+        self.add_widget(self.melody_selection)
+
+    def change_chord_button(self, instance):
+        if self.chord_option == 1:
+            option = 2
+        else:
+            option = 1
+
+        self.chord_option = option
+
+        self.remove_widget(self.melody_selection)
+        self.melody_selection = MelodySelection(
+            self.synth, 
+            self.sched, 
+            self.chords[self.chord_option], 
+            self.perc[self.perc_option],
+            self.melody,
+            self.change_key_button,
+            self.change_chord_button,
+            self.change_perc_button
+            )
+        self.add_widget(self.melody_selection)
+
+    def change_perc_button(self, instance):
+        if self.perc_option == 1:
+            option = 2
+        else:
+            option = 1
+
+        self.perc_option = option
+
+        self.remove_widget(self.melody_selection)
+        self.melody_selection = MelodySelection(
+            self.synth, 
+            self.sched, 
+            self.chords[self.chord_option], 
+            self.perc[self.perc_option],
+            self.melody,
+            self.change_key_button,
+            self.change_chord_button,
+            self.change_perc_button
+            )
+        self.add_widget(self.melody_selection)
+    
     #def on_layout(self, win_size):
         #self.active_screen.on_layout(win_size)
 
@@ -439,15 +491,7 @@ class MainWidget(BaseWidget):
 
     def on_update(self):
         self.audio.on_update()
-
-        # mouse over events
-        if self.screen_index == 2 or self.screen_index == 3:
-            # print(Window.mouse_pos)
-            self.active_screen.on_update(Window.mouse_pos[:2])
-        
-        if self.screen_index == 4:
-            # melody selection
-            self.active_screen.on_update()
+        self.active_screen.on_update()
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
