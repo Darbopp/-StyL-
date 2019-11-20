@@ -22,7 +22,7 @@ from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
 from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
-from selectionButton import SelectionButton
+from selectionButton import SelectionButton, BetterButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 from nowBar import NowBar
 
@@ -264,26 +264,20 @@ class MelodySelection(Widget):
 
         for obj in self.objects:
             self.canvas.add(obj)
-            
 
         dist_between = 75
-        b1 = Button(text="A", size_hint = (None, None), size = (50, 50), pos = (padding/2, Window.height - 1.5*padding))
-        b2 = Button(text="B", size_hint = (None, None), size = (50, 50), pos = (padding/2 + dist_between, Window.height - 1.5*padding))
-        b3 = Button(text="C", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 2*dist_between, Window.height - 1.5*padding))
-        b4 = Button(text="D", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 3*dist_between, Window.height - 1.5*padding))
-        b5 = Button(text="E", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 4*dist_between, Window.height - 1.5*padding))
-        b6 = Button(text="F", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 5*dist_between, Window.height - 1.5*padding))
-        b7 = Button(text="G", size_hint = (None, None), size = (50, 50), pos = (padding/2 + 6*dist_between, Window.height - 1.5*padding))
-
+        key_change_size = (50, 50)
+        b1 = BetterButton("A", key_change_size, (padding/2, Window.height - 1.5*padding), change_key)
+        b2 = BetterButton("B", key_change_size, (padding/2 + dist_between, Window.height - 1.5*padding), change_key)
+        b3 = BetterButton("C", key_change_size, (padding/2 + 2*dist_between, Window.height - 1.5*padding), change_key)
+        b4 = BetterButton("D", key_change_size, (padding/2 + 3*dist_between, Window.height - 1.5*padding), change_key)
+        b5 = BetterButton("E", key_change_size, (padding/2 + 4*dist_between, Window.height - 1.5*padding), change_key)
+        b6 = BetterButton("F", key_change_size, (padding/2 + 5*dist_between, Window.height - 1.5*padding), change_key)
+        b7 = BetterButton("G", key_change_size, (padding/2 + 6*dist_between, Window.height - 1.5*padding), change_key)
         self.keybuttons = [b1, b2, b3, b4, b5, b6, b7]
-        for button in self.keybuttons:
-            button.bind(on_press=change_key)
 
-        b8 = Button(text="Change Chord", size_hint = (None, None), size = (100, 50), pos = (padding/2 + 7*dist_between, Window.height - 1.5*padding))
-        b8.bind(on_press=change_chord)
-        
-        b9 = Button(text="Change Perc", size_hint = (None, None), size = (100, 50), pos = (9*dist_between, Window.height - 1.5*padding))
-        b9.bind(on_press=change_perc)
+        b8 = BetterButton("Change Chord", (100, 50), (padding/2 + 7*dist_between, Window.height - 1.5*padding), change_chord)
+        b9 = BetterButton("Change Perc", (100, 50), (padding/2 + 9*dist_between, Window.height - 1.5*padding), change_perc)
 
         self.buttons = self.keybuttons + [b8, b9]
         for button in self.buttons:
@@ -291,6 +285,8 @@ class MelodySelection(Widget):
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
+        for button in self.buttons:
+            button.on_touch_down(touch)
     
     def on_touch_move(self, touch):
         self.compBPlayer.on_touch_move(touch)
@@ -319,7 +315,6 @@ class MelodySelection(Widget):
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
     
-
     def on_key_down(self, keycode, modifiers):
         self.compBPlayer.on_key_down(keycode, modifiers)
         if keycode[1] == 'q':
@@ -435,7 +430,6 @@ class MainWidget(BaseWidget):
         self.screen_index = 4
 
     def change_key_button(self, instance):
-        print("Key is changing to " + instance.text)
         self.transposition = key_to_transpose[instance.text]
         self.melody = transpose_melody(self.style, 1, self.transposition)
         self.chords = transpose_instrument(self.style, "chords", self.transposition)
@@ -452,6 +446,7 @@ class MainWidget(BaseWidget):
             self.change_perc_button
             )
         self.add_widget(self.melody_selection)
+        self.active_screen = self.melody_selection
 
     def change_chord_button(self, instance):
         if self.chord_option == 1:
@@ -473,6 +468,7 @@ class MainWidget(BaseWidget):
             self.change_perc_button
             )
         self.add_widget(self.melody_selection)
+        self.active_screen = self.melody_selection
 
     def change_perc_button(self, instance):
         if self.perc_option == 1:
@@ -494,6 +490,7 @@ class MainWidget(BaseWidget):
             self.change_perc_button
             )
         self.add_widget(self.melody_selection)
+        self.active_screen = self.melody_selection
     
     #def on_layout(self, win_size):
         #self.active_screen.on_layout(win_size)

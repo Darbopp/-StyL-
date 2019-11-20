@@ -48,3 +48,19 @@ class SelectionButton(Button):
         if self.collide_point(x, y):
             self.callback(self.option)
             self.stop()
+
+
+class BetterButton(Button):
+    def __init__(self, text, size, pos, onclick_callback):
+        super(BetterButton, self).__init__()
+
+        self.text = text
+        self.size_hint = (None, None)
+        self.size = size
+        self.pos = pos
+        self.callback = onclick_callback
+
+    def on_touch_down(self, touch):
+        x, y = touch.pos
+        if self.collide_point(x, y):
+            self.callback(self)

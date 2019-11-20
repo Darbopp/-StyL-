@@ -1,9 +1,8 @@
-src/data
-src/data/__pycache__
-src/ourCode/__pycache__
-src/common/__pycache__
-__pycache__/
-
+src/data/
+src/ourCode/__pycache__/
+src/common/__pycache__/
+**/__pycache__/
+**/.vscode
 
 *.sf2
 *.pyc
