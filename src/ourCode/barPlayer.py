@@ -132,6 +132,9 @@ class LineComposeBarPlayer(BarPlayer):
 
         self.noteSeq.toggle()
 
+    def stop(self):
+        self.noteSeq.stop()
+
     def toggle_select_mode(self):
         if not self.isClicking:
             self.isSelecting = not self.isSelecting
@@ -566,8 +569,6 @@ class LineComposeBarPlayer(BarPlayer):
 
 
 
-
-
 class ComposeBarPlayer(BarPlayer):
     def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, velocity):
         super(ComposeBarPlayer, self).__init__(botLeft, size, sched, synth, channel, program)
@@ -634,6 +635,9 @@ class ComposeBarPlayer(BarPlayer):
             self.process()
 
         self.noteSeq.toggle()
+    
+    def stop(self):
+        self.noteSeq.stop()
 
     def process(self):
         self.clear_note_graphics()
@@ -893,6 +897,9 @@ class StaticBarPlayer(BarPlayer):
     
     def toggle(self):
         self.noteSeq.toggle()
+
+    def stop(self):
+        self.noteSeq.stop()
 
     def set_notes(self, newNotes):
         self.notes = newNotes

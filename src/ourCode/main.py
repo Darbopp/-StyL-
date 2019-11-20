@@ -277,11 +277,15 @@ class MelodySelection(Widget):
         self.keybuttons = [b1, b2, b3, b4, b5, b6, b7]
 
         b8 = BetterButton("Change Chord", (100, 50), (padding/2 + 7*dist_between, Window.height - 1.5*padding), change_chord)
-        b9 = BetterButton("Change Perc", (100, 50), (padding/2 + 9*dist_between, Window.height - 1.5*padding), change_perc)
+        b9 = BetterButton("Change Perc", (100, 50), (padding/2 + 8.66*dist_between, Window.height - 1.5*padding), change_perc)
 
         self.buttons = self.keybuttons + [b8, b9]
         for button in self.buttons:
             self.add_widget(button)
+
+    def stop(self):
+        for obj in self.objects:
+                obj.stop()
     
     def on_touch_down(self, touch):
         self.compBPlayer.on_touch_down(touch)
@@ -434,6 +438,7 @@ class MainWidget(BaseWidget):
         self.melody = transpose_melody(self.style, 1, self.transposition)
         self.chords = transpose_instrument(self.style, "chords", self.transposition)
 
+        self.melody_selection.stop()
         self.remove_widget(self.melody_selection)
         self.melody_selection = MelodySelection(
             self.synth, 
@@ -456,6 +461,7 @@ class MainWidget(BaseWidget):
 
         self.chord_option = option
 
+        self.melody_selection.stop()
         self.remove_widget(self.melody_selection)
         self.melody_selection = MelodySelection(
             self.synth, 
@@ -478,6 +484,7 @@ class MainWidget(BaseWidget):
 
         self.perc_option = option
 
+        self.melody_selection.stop()
         self.remove_widget(self.melody_selection)
         self.melody_selection = MelodySelection(
             self.synth, 
@@ -524,7 +531,6 @@ class MainWidget(BaseWidget):
 
         if self.melody_selection != None:
             self.melody_selection.on_layout(winsize)
-
 
     def on_update(self):
         self.audio.on_update()
