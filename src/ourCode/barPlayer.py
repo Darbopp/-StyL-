@@ -297,6 +297,9 @@ class LineComposeBarPlayer(BarPlayer):
         return pitch
 
     def resample_lines(self):
+        if len(self.lines) == 0: 
+            return 
+
         allPoints = []
         for line in self.lines:
             allPoints += line.points
