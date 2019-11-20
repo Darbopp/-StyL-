@@ -8,7 +8,7 @@ from common.synth import Synth
 from common.clock import Clock, SimpleTempoMap, AudioScheduler, kTicksPerQuarter, quantize_tick_up
 from common.metro import Metronome
 
-from smallGraphics import NoteShape, ComposeNoteShape, BeatBar
+from smallGraphics import NoteShape, ComposeNoteShape, BeatBar, SelectionBox
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics.instructions import InstructionGroup
 
@@ -67,7 +67,14 @@ class LineComposeBarPlayer(BarPlayer):
         
         
         self.lines = []
+        self.discreteLines = []
         self.currLine = None
+
+        self.isClicking = True
+        self.isSelecting = False
+        self.isMarkedToSelectToggle = False
+        self.selectionBox = None
+        self.selectedNotes = []
 
 
         self.changes = changes #[(startBeat, len, [allowed pitches])]
@@ -125,6 +132,13 @@ class LineComposeBarPlayer(BarPlayer):
 
         self.noteSeq.toggle()
 
+    def toggle_select_mode(self):
+        if not self.isClicking:
+            self.isSelecting = not self.isSelecting
+        else:
+            self.isMarkedToSelectToggle = not self.isMarkedToSelectToggle
+
+
     def process(self):
         self.clear_note_graphics()
         self.resample_lines()
@@ -151,6 +165,7 @@ class LineComposeBarPlayer(BarPlayer):
     def clear_note_graphics(self):
         for gNote in self.graphicNotes:
             self.remove(gNote)
+        self.graphicNotes=[]
 
     def clear_lines(self):
         self.currLine = None
@@ -162,6 +177,8 @@ class LineComposeBarPlayer(BarPlayer):
         for bar in self.beatBars:
             self.remove(bar)
             
+    def clear_discrete_lines(self):
+        self.discreteLines = []
     def create_beat_bars(self):
         leftRightPadding = 20
 
@@ -191,11 +208,58 @@ class LineComposeBarPlayer(BarPlayer):
             color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2], color = color)
+            noteGraphic = NoteShape(absCoords, note[2], note, color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
+
+    def display_discrete_lines(self):
+        self.add(Color(1,.5,.2))
+        for line in self.discreteLines:
+            self.add(line)
     
+    def hide_discrete_lines(self):
+        for line in self.discreteLines:
+            self.remove(line)
+
+    def select_notes(self):
+        selectPoints = self.selectionBox.get_points()
+
+        for gNote in self.graphicNotes:
+            if gNote.does_intersect_points(selectPoints):
+                self.selectedNotes.append(gNote)
+                gNote.highlight()
+
+    def deselect_notes(self):
+        for gNote in self.selectedNotes:
+            gNote.unhighlight()
+        self.selectedNotes = []
+    
+    def delete_selected_notes(self):
+        #copyOfgNotes = self.graphicNotes.copy()
+        self.clear_note_graphics()
+        for gNote in self.selectedNotes:
+            dataNote = gNote.getNote()
+            self.discreteLines.remove(dataNote[3])
+            #print("dataNote: ", dataNote)
+            #print("notes: ", self.notes)
+            self.notes.remove(dataNote)
+            #copyOfgNotes.remove(gNote)
+
+        #self.graphicNotes = copyOfgNotes
+        self.noteSeq.change_notes(self.notes)
+        
+        self.display_note_graphics()
+
+
+    def clear_all(self):
+        self.hide_discrete_lines()
+        self.clear_note_graphics()
+        self.clear_lines()
+        self.clear_real_notes()
+        self.clear_raw_notes()
+        self.clear_discrete_lines()
+
     def resize(self, newSize, botLeft):
 
         self.botLeft = botLeft
@@ -249,7 +313,7 @@ class LineComposeBarPlayer(BarPlayer):
         outY = np.interp(outX, allX, allY)
 
 
-        self.add(Color(1,.5,.2))
+        #self.add(Color(1,.5,.2))
         #discretize plot
         self.clear_lines()
         threshold = 15 #difference in Y that gets absorbed
@@ -258,21 +322,22 @@ class LineComposeBarPlayer(BarPlayer):
             xVal = outX[index]
             if lastYVal == None:
                 myLine = Line(points=[xVal, yVal], width=2)
-                self.add(myLine)
+                #self.add(myLine)
                 self.currLine = myLine
-                self.lines.append(myLine)
+                self.discreteLines.append(myLine)
                 lastYVal = yVal
             else:
                 if abs(lastYVal-yVal) < threshold:
                     self.currLine.points += [xVal, lastYVal]
                 else:
                     myLine = Line(points=[xVal, yVal], width=2)
-                    self.add(myLine)
+                    #self.add(myLine)
                     self.currLine = myLine
-                    self.lines.append(myLine)
+                    self.discreteLines.append(myLine)
                     lastYVal = yVal
 
-
+        #for line in self.discreteLines:
+        #    self.add(line)
 
         #plot for testing
         '''
@@ -297,7 +362,7 @@ class LineComposeBarPlayer(BarPlayer):
         sizePerEigth = sizePerBeat / 2
         startingBeat = 20
 
-        for index, rawLine in enumerate(self.lines):
+        for index, rawLine in enumerate(self.discreteLines):
             '''
             beginX = rawLine.points[0]
             beginY = rawLine.points[1]
@@ -327,7 +392,7 @@ class LineComposeBarPlayer(BarPlayer):
             snappedBeginBeat = eigthBeginX / (2*sizePerEigth)
             snappedBeginBeat = self.round_to_beat(snappedBeginBeat, .5)
 
-            snappedNote = (pitch, snappedBeginBeat-.5, noteLength)
+            snappedNote = (pitch, snappedBeginBeat-.5, noteLength, rawLine)
             #print("beginX: ", beginX)
             #print("endX: ", endX)
             #print("beginY: ", beginY)
@@ -341,7 +406,7 @@ class LineComposeBarPlayer(BarPlayer):
             if noteLength > 0:
                 self.notes.append(snappedNote)
         
-        print("notes: ", self.notes)
+        #print("notes: ", self.notes)
 
 
 
@@ -352,21 +417,21 @@ class LineComposeBarPlayer(BarPlayer):
             return elem[1]
         
         self.notes.sort(key=note_startBeat)
-        print("notes in apply: ", self.notes)
+        #print("notes in apply: ", self.notes)
 
         for i in range(len(self.notes)):
             oldPitch = self.notes[i][0]
             newPitch = rule1.new_note(i)
             if oldPitch != newPitch:
-                print("ITS HAPPENING AT INDEX: ", i)
-                print("oldPitch: ", oldPitch)
-                print("newPitch: ", newPitch)
-                newNote = ( newPitch, self.notes[i][1], self.notes[i][2])
+                #print("ITS HAPPENING AT INDEX: ", i)
+                #print("oldPitch: ", oldPitch)
+                #print("newPitch: ", newPitch)
+                newNote = ( newPitch, self.notes[i][1], self.notes[i][2], self.notes[i][3])
                 #self.notes[i][1] = newPitch
                 self.notes[i] = newNote
 
-        print("notes after rule: ", self.notes)
-        print("changes: ", self.changes)
+        #print("notes after rule: ", self.notes)
+        #print("changes: ", self.changes)
         
 
   
@@ -393,16 +458,47 @@ class LineComposeBarPlayer(BarPlayer):
 
     def on_touch_down(self, touch):
         p = touch.pos
+        self.isClicking = True
+
+        #Deselect any currently selected notes
+        self.deselect_notes()
+
         if self.is_touch_on_me(p):
-            myLine = Line(points=[p[0], p[1]], width = 2)
-            self.add(myLine)
-            self.currLine = myLine
-            self.lines.append(myLine)
+            if self.isSelecting:
+                self.selectionBox = SelectionBox(p)
+                self.add(self.selectionBox)
+
+            else:
+                self.add(Color(rgb=(1,1,1), a=1))
+                myLine = Line(points=[p[0], p[1]], width = 2)
+                self.add(myLine)
+                self.currLine = myLine
+                self.lines.append(myLine)
     
     def on_touch_move(self, touch):
         p = touch.pos
+        #print("Is Selecting: ", self.isSelecting)
         if self.is_touch_on_me(p):
-            self.currLine.points = self.currLine.points + [p[0],p[1]]
+            if self.isSelecting:
+                self.selectionBox.new_end_point(p)
+            else:
+                if self.currLine != None:
+                    self.currLine.points = self.currLine.points + [p[0],p[1]]
+    
+    def on_touch_up(self, touch):
+        print("IM UP OKAY MOM")
+        p = touch.pos
+
+        if self.isSelecting:
+            #find notes selected and highlight them
+            self.select_notes()
+            self.remove(self.selectionBox)
+            self.selectionBox = None
+
+        self.isClicking = False
+        if self.isMarkedToSelectToggle:
+            self.isSelecting = not self.isSelecting
+            self.isMarkedToSelectToggle = False
 
 
 
@@ -420,10 +516,25 @@ class LineComposeBarPlayer(BarPlayer):
             self.display_note_graphics()
         if keycode[1] == 'n':
             self.clear_note_graphics()
-            print("In keycode n")
             self.apply_rules()
             self.noteSeq.change_notes(self.notes)
             self.display_note_graphics()
+        if keycode[1] == 'k':
+            self.display_discrete_lines()
+        if keycode[1] == 'l':
+            self.hide_discrete_lines()
+        if keycode[1] == 'f':
+            self.toggle_select_mode()
+        if keycode[1] == 'd':
+            self.delete_selected_notes()
+        if keycode[1] == 'm':
+            self.resample_lines()
+            self.lines_to_notes()
+            self.apply_rules()
+            self.noteSeq.change_notes(self.notes)
+            self.display_note_graphics()
+        if keycode[1] == ',':
+            self.clear_all()
 
     '''
     Determines where the note should be in relative coords based on what beat the note starts on and the midiPitch
@@ -683,7 +794,7 @@ class ComposeBarPlayer(BarPlayer):
             self.notes.append(snappedNote)
 
 
-        print("notes: ", self.notes)
+        #print("notes: ", self.notes)
 
 
     

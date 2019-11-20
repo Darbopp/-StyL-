@@ -136,7 +136,7 @@ def chords_to_changes(chords):
         else:
             currentStartBeat = note[1]
             output.append((note[1], note[2], [note[0]]))
-    print("CHORD TO CHANGES output: ",output)
+    #print("CHORD TO CHANGES output: ",output)
     return (output, allNotes)
 
 def combine_changes_and_scale(changeNotes, scaleNotes):

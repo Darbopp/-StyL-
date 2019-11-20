@@ -15,9 +15,9 @@ class NowBar(InstructionGroup):
         self.playing = False
 
         self.x = self.x1
-        self.bar = Line(points=[self.x, self.y1, self.x, self.y2])
+        self.bar = Line(points=[self.x, self.y1, self.x, self.y2], width=2)
 
-        self.add(Color(1, 1, 1))
+        self.add(Color(.2, .8, .6))
         self.add(self.bar)
 
     def play(self):

@@ -276,6 +276,9 @@ class MelodySelection(Widget):
     def on_touch_move(self, touch):
         self.compBPlayer.on_touch_move(touch)
 
+    def on_touch_up(self, touch):
+        self.compBPlayer.on_touch_up(touch)
+
     def on_layout(self, win_size):
         w = win_size[0]
         h = win_size[1]
@@ -495,4 +498,4 @@ class MainWidget(BaseWidget):
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
-    run(eval('MainWidget'))
+    run(MainWidget)

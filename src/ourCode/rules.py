@@ -49,11 +49,11 @@ class DownBeatChordToneRule(Rule):
         if True:
             for index, change in enumerate(self.changes):
                 if index == len(self.changes)-1:
-                    print("currChange: ", change)
+                    #print("currChange: ", change)
                     newPitch = self.closest_pitch(oldPitch, change[2])                  
                 else:
                     if oldStartBeat >= change[0] and oldStartBeat < self.changes[index+1][0]:
-                        print("currChange: ", change)
+                        #print("currChange: ", change)
                         newPitch = self.closest_pitch(oldPitch, change[2])
                         break
         if newPitch == None:
