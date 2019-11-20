@@ -56,6 +56,13 @@ class StyleSelection(FloatLayout):
     def on_key_down(self, keycode, modifiers):
         pass
 
+    def on_layout(self, winsize):
+        w = winsize[0]
+        h = winsize[1]
+        self.option1.pos = (w/2-150, h/2)
+        self.option2.pos = (w/2-150, h/2 - 200)
+        self.label.pos=(w * 0.3, h * 0.5)
+
 class KeySelection(FloatLayout):
     def __init__(self, transposeCallback):
         super(KeySelection, self).__init__()
@@ -66,34 +73,34 @@ class KeySelection(FloatLayout):
 
         self.orientation = "vertical"
 
-        b1 = Button(text="A", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 225))
-        b1.bind(on_press=transposeCallback)
+        self.b1 = Button(text="A", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 225))
+        self.b1.bind(on_press=transposeCallback)
 
-        b2 = Button(text="B", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 150))
-        b2.bind(on_press=transposeCallback)
+        self.b2 = Button(text="B", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 150))
+        self.b2.bind(on_press=transposeCallback)
 
-        b3 = Button(text="C", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 75))
-        b3.bind(on_press=transposeCallback)
+        self.b3 = Button(text="C", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 75))
+        self.b3.bind(on_press=transposeCallback)
 
-        b4 = Button(text="D", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
-        b4.bind(on_press=transposeCallback)
+        self.b4 = Button(text="D", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        self.b4.bind(on_press=transposeCallback)
 
-        b5 = Button(text="E", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 75))
-        b5.bind(on_press=transposeCallback)
+        self.b5 = Button(text="E", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 75))
+        self.b5.bind(on_press=transposeCallback)
 
-        b6 = Button(text="F", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 150))
-        b6.bind(on_press=transposeCallback)
+        self.b6 = Button(text="F", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 150))
+        self.b6.bind(on_press=transposeCallback)
 
-        b7 = Button(text="G", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 225))
-        b7.bind(on_press=transposeCallback)
+        self.b7 = Button(text="G", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 225))
+        self.b7.bind(on_press=transposeCallback)
         
-        self.add_widget(b1)
-        self.add_widget(b2)
-        self.add_widget(b3)
-        self.add_widget(b4)
-        self.add_widget(b5)
-        self.add_widget(b6)
-        self.add_widget(b7)
+        self.add_widget(self.b1)
+        self.add_widget(self.b2)
+        self.add_widget(self.b3)
+        self.add_widget(self.b4)
+        self.add_widget(self.b5)
+        self.add_widget(self.b6)
+        self.add_widget(self.b7)
 
     def on_update(self):
         pass
@@ -103,6 +110,18 @@ class KeySelection(FloatLayout):
 
     def on_key_down(self, keycode, modifiers):
         pass
+
+    def on_layout(self, winsize):
+        w = winsize[0]
+        h = winsize[1]
+        self.b1.pos = (w/2-150, h/2 + 225)
+        self.b2.pos = (w/2-150, h/2 + 150)
+        self.b3.pos = (w/2-150, h/2 + 75)
+        self.b4.pos = (w/2-150, h/2)
+        self.b5.pos = (w/2-150, h/2 - 75)
+        self.b6.pos = (w/2-150, h/2 - 150)
+        self.b7.pos = (w/2-150, h/2 - 225)
+        self.label.pos=(w * 0.3, h * 0.5)
 
 class ChordSelection(FloatLayout):
     def __init__(self, chordCallback, sched, synth, chord_options):
@@ -299,6 +318,7 @@ class MelodySelection(Widget):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
+    
 
     def on_key_down(self, keycode, modifiers):
         self.compBPlayer.on_key_down(keycode, modifiers)
@@ -492,10 +512,27 @@ class MainWidget(BaseWidget):
     def on_key_down(self, keycode, modifiers):
         self.active_screen.on_key_down(keycode, modifiers)
 
+    def on_layout(self, winsize):
+        if self.style_selection != None:
+            self.style_selection.on_layout(winsize)
+
+        if self.key_selection != None:
+            self.key_selection.on_layout(winsize)
+
+        if self.chord_selection != None:
+            self.chord_selection.on_layout(winsize)
+
+        if self.perc_selection != None:
+            self.perc_selection.on_layout(winsize)
+
+        if self.melody_selection != None:
+            self.melody_selection.on_layout(winsize)
+
+
     def on_update(self):
         self.audio.on_update()
         self.active_screen.on_update()
 
 if __name__ == "__main__":
     # pass in which MainWidget to run as a command-line arg
-    run(MainWidget)
+    run(eval("MainWidget"))

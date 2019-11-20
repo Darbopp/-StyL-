@@ -379,6 +379,11 @@ class LineComposeBarPlayer(BarPlayer):
             endX = max(min(rawLine.points[-2]-sizePerBeat,self.width), leftRightPadding) -10
             endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
 
+            #beginX = max(min(rawLine.points[0]-sizePerEigth,self.width-2*leftRightPadding), leftRightPadding) #-10
+            #beginY = max(min(rawLine.points[1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+            #endX = max(min(rawLine.points[-2]-sizePerEigth,self.width), leftRightPadding) #-10
+            #endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+
             eigthBeginX = self.round_to_beat(beginX, sizePerEigth) -10 #- leftRightPadding
             eigthEndX = self.round_to_beat(endX, sizePerEigth) -10 #- leftRightPadding
 
@@ -486,7 +491,7 @@ class LineComposeBarPlayer(BarPlayer):
                     self.currLine.points = self.currLine.points + [p[0],p[1]]
     
     def on_touch_up(self, touch):
-        print("IM UP OKAY MOM")
+        #print("IM UP OKAY MOM")
         p = touch.pos
 
         if self.isSelecting:
@@ -528,6 +533,7 @@ class LineComposeBarPlayer(BarPlayer):
         if keycode[1] == 'd':
             self.delete_selected_notes()
         if keycode[1] == 'm':
+            self.clear_note_graphics()
             self.resample_lines()
             self.lines_to_notes()
             self.apply_rules()
