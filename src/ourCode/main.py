@@ -21,7 +21,7 @@ from kivy.graphics.instructions import InstructionGroup
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
-from barPlayer import StaticBarPlayer, ComposeBarPlayer, LineComposeBarPlayer
+from barPlayer import StaticBarPlayer, LineComposeBarPlayer
 from selectionButton import SelectionButton, BetterButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 from nowBar import NowBar
@@ -221,6 +221,8 @@ class MelodySelection(Widget):
         w = Window.width
         h = Window.height
         padding = 50
+
+        self.melody = melody
         
         # Audio Generation
         self.synth = synth
@@ -297,6 +299,34 @@ class MelodySelection(Widget):
 
     def on_touch_up(self, touch):
         self.compBPlayer.on_touch_up(touch)
+
+    def change_chords(self, chords):
+        self.midBPlayer.set_notes(chords['midi'])
+        self.midBPlayer.set_pitches(chords['pitches'])
+        self.midBPlayer.clear_note_graphics()
+        self.midBPlayer.display_note_graphics()
+
+        changesAndNotes = chords_to_changes(chords)
+        changes = changesAndNotes[0]
+        changeNotes = changesAndNotes[1]
+        scaleNotes = self.melody['pitches']
+        combinedNotes = combine_changes_and_scale(changeNotes, scaleNotes)
+
+        self.compBPlayer.set_changes(changes)
+        self.compBPlayer.set_allPitches(combinedNotes)
+        self.compBPlayer.set_scaleNotes(scaleNotes)
+        self.compBPlayer.clear_note_graphics()
+        self.compBPlayer.clear_real_notes()
+        self.compBPlayer.lines_to_notes()
+        self.compBPlayer.apply_rules()
+        self.compBPlayer.display_note_graphics()
+
+
+    def change_perc(self, perc):
+        self.botBPlayer.set_notes(perc['midi'])
+        self.botBPlayer.set_pitches(perc['pitches'])
+        self.botBPlayer.clear_note_graphics()
+        self.botBPlayer.display_note_graphics()
 
     def on_layout(self, win_size):
         w = win_size[0]
@@ -461,20 +491,7 @@ class MainWidget(BaseWidget):
 
         self.chord_option = option
 
-        self.melody_selection.stop()
-        self.remove_widget(self.melody_selection)
-        self.melody_selection = MelodySelection(
-            self.synth, 
-            self.sched, 
-            self.chords[self.chord_option], 
-            self.perc[self.perc_option],
-            self.melody,
-            self.change_key_button,
-            self.change_chord_button,
-            self.change_perc_button
-            )
-        self.add_widget(self.melody_selection)
-        self.active_screen = self.melody_selection
+        self.melody_selection.change_chords(self.chords[self.chord_option])
 
     def change_perc_button(self, instance):
         if self.perc_option == 1:
@@ -484,20 +501,7 @@ class MainWidget(BaseWidget):
 
         self.perc_option = option
 
-        self.melody_selection.stop()
-        self.remove_widget(self.melody_selection)
-        self.melody_selection = MelodySelection(
-            self.synth, 
-            self.sched, 
-            self.chords[self.chord_option], 
-            self.perc[self.perc_option],
-            self.melody,
-            self.change_key_button,
-            self.change_chord_button,
-            self.change_perc_button
-            )
-        self.add_widget(self.melody_selection)
-        self.active_screen = self.melody_selection
+        self.melody_selection.change_perc(self.perc[self.perc_option])
     
     #def on_layout(self, win_size):
         #self.active_screen.on_layout(win_size)
