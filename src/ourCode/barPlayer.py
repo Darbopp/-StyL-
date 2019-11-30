@@ -339,7 +339,19 @@ class LineComposeBarPlayer(BarPlayer):
         #use the interpolated X values to evaluate Y values
         outY = np.interp(outX, allX, allY)
 
-
+        def is_rest(index):
+            restThresh = 20
+            xVal = outX[index]
+            if xVal < allX[0]:
+                return True
+            for i, x in enumerate(allX):
+                if x > xVal:
+                    if abs(x-xVal) > restThresh and abs(allX[i-1] - xVal) > restThresh:
+                        return True
+                    else:
+                        return False
+            return False
+    
         #self.add(Color(1,.5,.2))
         #discretize plot
         self.clear_lines()
@@ -347,21 +359,35 @@ class LineComposeBarPlayer(BarPlayer):
         lastYVal = None
         for index,yVal in enumerate(outY):
             xVal = outX[index]
-            if lastYVal == None:
-                myLine = Line(points=[xVal, yVal], width=2)
-                #self.add(myLine)
-                self.currLine = myLine
-                self.discreteLines.append(myLine)
-                lastYVal = yVal
+            if is_rest(index):
+                if lastYVal is not None:
+                    lastYVal = None
             else:
-                if abs(lastYVal-yVal) < threshold:
-                    self.currLine.points += [xVal, lastYVal]
-                else:
+                if lastYVal == None:
                     myLine = Line(points=[xVal, yVal], width=2)
                     #self.add(myLine)
                     self.currLine = myLine
                     self.discreteLines.append(myLine)
                     lastYVal = yVal
+                else:
+                    if abs(lastYVal-yVal) < threshold:
+                        self.currLine.points += [xVal, lastYVal]
+                    else:
+                        myLine = Line(points=[xVal, yVal], width=2)
+                        #self.add(myLine)
+                        self.currLine = myLine
+                        self.discreteLines.append(myLine)
+                        lastYVal = yVal
+
+
+        #cull the baddies
+        real_discrete_lines = []
+        length_thresh = 10
+        for line in self.discreteLines:
+            points = line.points
+            if abs(points[0] - points[-2]) > length_thresh:
+                real_discrete_lines.append(line)
+        self.discreteLines = real_discrete_lines
 
         #for line in self.discreteLines:
         #    self.add(line)
@@ -401,10 +427,15 @@ class LineComposeBarPlayer(BarPlayer):
             #print("First round Y: ", min(rawLine.points[1],self.height-2*topBottomPadding))
             #print("Second round Y: ", max(min(rawLine.points[1],self.height-2*topBottomPadding), topBottomPadding))
 
-            beginX = max(min(rawLine.points[0]-sizePerBeat,self.width-2*leftRightPadding), leftRightPadding) -10
+            # beginX = max(min(rawLine.points[0]-sizePerBeat,self.width-2*leftRightPadding), leftRightPadding) -10
+            # beginY = max(min(rawLine.points[1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+            # endX = max(min(rawLine.points[-2]-sizePerBeat,self.width), leftRightPadding) -10
+            # endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+
+            beginX = max(min(rawLine.points[0],self.width-2*leftRightPadding), leftRightPadding) -10
             beginY = max(min(rawLine.points[1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
-            endX = max(min(rawLine.points[-2]-sizePerBeat,self.width), leftRightPadding) -10
-            endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
+            endX = max(min(rawLine.points[-2],self.width), leftRightPadding) -10
+            endY = max(min(rawLine.points[-1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)            
 
             #beginX = max(min(rawLine.points[0]-sizePerEigth,self.width-2*leftRightPadding), leftRightPadding) #-10
             #beginY = max(min(rawLine.points[1]-self.botLeft[1],self.height-2*topBottomPadding), topBottomPadding)
