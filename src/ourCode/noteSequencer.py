@@ -60,6 +60,9 @@ class NoteSequencer(object):
             ticksDeep = 480*note[1]
             cmd = self.sched.post_at_tick(self._noteon, (next_beat + ticksDeep) )
             self.cmds.append(cmd) #remember to remember the commands incase we need to stop
+            #print("note is at", note[1])
+        cmd = self.sched.post_at_tick(self._killself, (next_beat + 480*16 - 30))
+        self.cmds.append(cmd)
 
     def stop(self):
         if not self.playing:
@@ -121,15 +124,20 @@ class NoteSequencer(object):
                 self.cmds.append(cmd)
                 self.noteIndex = 0
             '''
-            if self.doneCallback != None:
+            if self.doneCallback is not None:
                 self.shouldCallBack = True
             self.noteIndex = 0
-            self.stop()
+            #self.stop()
 
 
     def _noteoff(self, tick, pitch):
         # just turn off the currently sounding note.
         self.synth.noteoff(self.channel, pitch)
 
+        # if self.shouldCallBack:
+        #     self.doneCallback()
+
+    def _killself(self, tick, pitch):
+        self.stop()
         if self.shouldCallBack:
             self.doneCallback()

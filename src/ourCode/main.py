@@ -220,7 +220,7 @@ class MelodySelection(Widget):
         super(MelodySelection, self).__init__()
         w = Window.width
         h = Window.height
-        padding = 50
+        padding = 20
 
         self.melody = melody
         self.currCompIndex = 0
@@ -287,20 +287,20 @@ class MelodySelection(Widget):
         for obj in self.objects:
             self.canvas.add(obj)
 
-
+        b_padding = 50
         dist_between = 75
         key_change_size = (50, 50)
-        b1 = BetterButton("A", key_change_size, (padding/2, Window.height - 1.5*padding), change_key)
-        b2 = BetterButton("B", key_change_size, (padding/2 + dist_between, Window.height - 1.5*padding), change_key)
-        b3 = BetterButton("C", key_change_size, (padding/2 + 2*dist_between, Window.height - 1.5*padding), change_key)
-        b4 = BetterButton("D", key_change_size, (padding/2 + 3*dist_between, Window.height - 1.5*padding), change_key)
-        b5 = BetterButton("E", key_change_size, (padding/2 + 4*dist_between, Window.height - 1.5*padding), change_key)
-        b6 = BetterButton("F", key_change_size, (padding/2 + 5*dist_between, Window.height - 1.5*padding), change_key)
-        b7 = BetterButton("G", key_change_size, (padding/2 + 6*dist_between, Window.height - 1.5*padding), change_key)
+        b1 = BetterButton("A", key_change_size, (b_padding/2, Window.height - 1.5*b_padding), change_key)
+        b2 = BetterButton("B", key_change_size, (b_padding/2 + dist_between, Window.height - 1.5*b_padding), change_key)
+        b3 = BetterButton("C", key_change_size, (b_padding/2 + 2*dist_between, Window.height - 1.5*b_padding), change_key)
+        b4 = BetterButton("D", key_change_size, (b_padding/2 + 3*dist_between, Window.height - 1.5*b_padding), change_key)
+        b5 = BetterButton("E", key_change_size, (b_padding/2 + 4*dist_between, Window.height - 1.5*b_padding), change_key)
+        b6 = BetterButton("F", key_change_size, (b_padding/2 + 5*dist_between, Window.height - 1.5*b_padding), change_key)
+        b7 = BetterButton("G", key_change_size, (b_padding/2 + 6*dist_between, Window.height - 1.5*b_padding), change_key)
         self.keybuttons = [b1, b2, b3, b4, b5, b6, b7]
 
-        b8 = BetterButton("Change Chord", (100, 50), (padding/2 + 7*dist_between, Window.height - 1.5*padding), change_chord)
-        b9 = BetterButton("Change Perc", (100, 50), (padding/2 + 8.66*dist_between, Window.height - 1.5*padding), change_perc)
+        b8 = BetterButton("Change Chord", (100, 50), (b_padding/2 + 7*dist_between, Window.height - 1.5*b_padding), change_chord)
+        b9 = BetterButton("Change Perc", (100, 50), (b_padding/2 + 8.66*dist_between, Window.height - 1.5*b_padding), change_perc)
 
         self.buttons = self.keybuttons + [b8, b9]
         for button in self.buttons:
@@ -329,18 +329,23 @@ class MelodySelection(Widget):
 
 
     def four_bar_done_callback(self):
-        print("currIndex: ", self.currCompIndex)
+        #print("currIndex: ", self.currCompIndex)
         if self.currCompIndex < len(self.compBars) - 1:
-            print("in the if statement")
+            #print("in the if statement")
+            # self.compBars[self.currCompIndex].stop()
+            self.botBPlayer.stop()
+            self.midBPlayer.stop()
+            # self.nowBar.stop()
             self.next_bars()
-            thing = 0
-            #literally here just to slow things down idk
-            for i in range(700000):
-                thing+=1
+            # thing = 0
+            # #literally here just to slow things down idk
+            # for i in range(700000):
+            #     thing+=1
+            self.nowBar.play()
             self.botBPlayer.play()
             self.midBPlayer.play()
             self.compBars[self.currCompIndex].play()
-            self.nowBar.play()
+            
     
     def on_touch_down(self, touch):
         self.compBars[self.currCompIndex].on_touch_down(touch)
@@ -388,7 +393,7 @@ class MelodySelection(Widget):
     def on_layout(self, win_size):
         w = win_size[0]
         h = win_size[1]
-        padding = 50
+        padding = 20
         halfHeight = (h - 4*padding) / 2
         quarterHeight = halfHeight / 2
         paddedWidth = w - 2*padding

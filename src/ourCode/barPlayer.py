@@ -225,7 +225,7 @@ class LineComposeBarPlayer(BarPlayer):
             color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2], note, color = color)
+            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], note, color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
@@ -303,10 +303,17 @@ class LineComposeBarPlayer(BarPlayer):
         def get_startBeat(elem):
             return elem[0]
         
-        numBuckets = len(self.scaleNotes)
+        #numBuckets = len(self.scaleNotes)
+        numBuckets = len(self.possiblePitches)
         sizePerBucket = height/numBuckets
         noteBucket = int(rawY // sizePerBucket)
-        pitch = self.scaleNotes[noteBucket]
+        #print("scale Notes: ", self.scaleNotes)
+        # print("Possible Notes: ", self.possiblePitches)
+        # print("rawY: ", rawY)
+        # print("height: ", height)
+        #pitch = self.scaleNotes[noteBucket]
+        pitch = self.possiblePitches[noteBucket]
+        #print("pitch: ", pitch)
 
         return pitch
 
@@ -568,21 +575,22 @@ class LineComposeBarPlayer(BarPlayer):
     '''
     def note_to_coord(self, beatAndPitch):
         leftRightPadding = 20
-        topBottomPadding = 10
+        topBottomPadding = 5
         numBeats = 4*4
         noteHeight = 40 #added to take into account the height when determining ranges
         noteWidth = 40 # added to take into account the width when determining ranges
 
         xRange = self.width - 2*leftRightPadding
-        yRange = self.height - 2*topBottomPadding - noteHeight
+        yRange = self.height - 2*topBottomPadding
 
         sizePerBeat = xRange / numBeats
         sizePerPitch = yRange / len(self.possiblePitches)
 
+
         xVal = (sizePerBeat * beatAndPitch[0]) + leftRightPadding 
         yVal = (sizePerPitch * self.possiblePitches.index(beatAndPitch[1])) + topBottomPadding
 
-        return (xVal, yVal)
+        return (xVal, yVal, sizePerPitch)
 
 
 
@@ -594,6 +602,7 @@ class StaticBarPlayer(BarPlayer):
         self.graphicNotes = [] #list of all graphic notes so we can remove them if needed
         #a list of all the possible Pitches. Important to get correct relative layout
         self.possiblePitches = sorted(posPitches)
+        self.size = size
 
         self.velocity = velocity #volume
 
@@ -652,7 +661,7 @@ class StaticBarPlayer(BarPlayer):
             color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2], color = color)
+            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], color = color)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
@@ -663,13 +672,13 @@ class StaticBarPlayer(BarPlayer):
     '''
     def note_to_coord(self, beatAndPitch):
         leftRightPadding = 20
-        topBottomPadding = 10
+        topBottomPadding = 5
         numBeats = 4*4
         noteHeight = 40 #added to take into account the height when determining ranges
         noteWidth = 40 # added to take into account the width when determining ranges
 
-        xRange = self.width - 2*leftRightPadding #+ noteWidth
-        yRange = self.height - 2*topBottomPadding - noteHeight
+        xRange = self.size[0] - 2*leftRightPadding #+ noteWidth
+        yRange = self.size[1] - 2*topBottomPadding
 
         sizePerBeat = xRange / numBeats
         sizePerPitch = yRange / len(self.possiblePitches)
@@ -677,7 +686,7 @@ class StaticBarPlayer(BarPlayer):
         xVal = (sizePerBeat * beatAndPitch[0]) + leftRightPadding 
         yVal = (sizePerPitch * self.possiblePitches.index(beatAndPitch[1])) + topBottomPadding
 
-        return (xVal, yVal)
+        return (xVal, yVal,sizePerPitch)
 
 
 

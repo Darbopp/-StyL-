@@ -12,27 +12,28 @@ from kivy.graphics import PushMatrix, PopMatrix, Translate, Scale, Rotate
 
 
 class NoteShape(InstructionGroup):
-    def __init__(self, botLeftPos, noteLength, fullNote=None, color = None, qNoteLength = 40):
+    def __init__(self, botLeftPos, noteLength, blockHeight, fullNote=None, color = None, qNoteLength = 40):
         super(NoteShape, self).__init__()
 
         #noteLength passed in incase we want to change shape based on length
 
         w = Window.width
 
-        self.height = qNoteLength * abs(noteLength)
+        self.height = blockHeight
         self.width = qNoteLength * abs(noteLength)
 
         self.fullNote = fullNote
 
-        leftX = botLeftPos[0]
-        #botY = botLeftPos[1]
+        self.leftX = botLeftPos[0]
+        self.botY = botLeftPos[1]
 
-        self.shape = Ellipse(pos = botLeftPos, size=(self.width, self.height))
+        #self.shape = Ellipse(pos = botLeftPos, size=(self.width, self.height))
+        self.shape = Rectangle(pos=botLeftPos, size=(self.width, self.height))
 
         if not color: 
-            colorChange = leftX / w
+            colorChange = self.leftX / w
             hue = .6 + .5 * (colorChange) 
-            self.color = Color(hsv=(hue, 1, 1), a=0.5)
+            self.color = Color(hsv=(hue, 1, 1), a=1)
 
         else: 
             self.color = Color(*color)
@@ -42,7 +43,7 @@ class NoteShape(InstructionGroup):
 
         self.highlightColor = Color(rgb=(1,1,1), a=0)
         self.centerPos = (botLeftPos[0] + self.width/2 , botLeftPos[1] + self.height/2)
-        self.highlightCircle = Line(ellipse=(botLeftPos[0], botLeftPos[1],self.width, self.height), width=2)
+        self.highlightCircle = Line(rectangle=(botLeftPos[0], botLeftPos[1],self.width, self.height), width=2)
         
         self.add(self.highlightColor)
         self.add(self.highlightCircle)
@@ -58,36 +59,57 @@ class NoteShape(InstructionGroup):
     #You might need this. :(
     # https://gamedev.stackexchange.com/questions/109393/how-do-i-check-for-collision-between-an-ellipse-and-a-rectangle
     # circle collision from: http://www.jeffreythompson.org/collision-detection/circle-rect.php
+    # def does_intersect_points(self, points):
+    #     radius = self.width/2
+
+    #     rx = points[0]
+    #     ry = points[1]
+
+    #     cx = self.centerPos[0]
+    #     cy = self.centerPos[1]
+
+    #     testX = cx
+    #     testY = cy
+
+    #     if (cx < rx):
+    #         testX = rx
+    #     elif (cx > points[2]):
+    #         testX = points[2]
+        
+    #     if (cy < ry):
+    #         testY = ry
+    #     elif (cy > points[3]):
+    #         testY = points[3]
+        
+    #     distX = cx-testX
+    #     distY = cy-testY
+
+    #     distance = ((distX*distX) + (distY*distY))**(.5)
+    #     if ( distance <= radius):
+    #         return True
+        
+    #     return False
+
     def does_intersect_points(self, points):
-        radius = self.width/2
+        olx = points[0]
+        oby = points[1]
+        orx = points[2]
+        oty = points[3]
 
-        rx = points[0]
-        ry = points[1]
+        mlx = self.leftX
+        mby = self.botY
+        mrx = self.leftX + self.width
+        mty = self.botY + self.height
 
-        cx = self.centerPos[0]
-        cy = self.centerPos[1]
-
-        testX = cx
-        testY = cy
-
-        if (cx < rx):
-            testX = rx
-        elif (cx > points[2]):
-            testX = points[2]
-        
-        if (cy < ry):
-            testY = ry
-        elif (cy > points[3]):
-            testY = points[3]
-        
-        distX = cx-testX
-        distY = cy-testY
-
-        distance = ((distX*distX) + (distY*distY))**(.5)
-        if ( distance <= radius):
+        if (mrx >= olx and #my right edge past other left
+            mlx <= orx and #my left edge past other right
+            mty >= oby and #my top edge past other bottom
+            mby <= oty ):  #my bottom edge past other top
             return True
-        
-        return False
+        else:
+            return False
+
+
 
     def getNote(self):
         return self.fullNote
