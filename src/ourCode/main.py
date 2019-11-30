@@ -223,6 +223,7 @@ class MelodySelection(Widget):
         padding = 50
 
         self.melody = melody
+        self.currCompIndex = 0
         
         # Audio Generation
         self.synth = synth
@@ -257,15 +258,35 @@ class MelodySelection(Widget):
         #def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, velocity):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
-        self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110)
+        self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
         self.compBNowBar = NowBar(compBarPlayerPos, compBarPlayerSize, now_bar_padding, self.speed)
 
-        self.barPlayers = [self.botBPlayer, self.midBPlayer, self.compBPlayer]
-        self.nowBars = [self.botBNowBar, self.midBNowBar, self.compBNowBar]
-        self.objects = self.barPlayers + self.nowBars
+        self.compBPlayer2 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
 
+
+        self.compBPlayer3 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
+
+
+        self.compBPlayer4 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
+
+
+        #self.compBPlayer3 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
+        #self.compBNowBar3 = NowBar(compBarPlayerPos, compBarPlayerSize, now_bar_padding, self.speed)
+
+        self.nowBar = NowBar(botBarPlayerPos, (paddedWidth, halfHeight+quarterHeight+quarterHeight+2*padding), now_bar_padding, self.speed)
+
+
+        self.compBars = [self.compBPlayer, self.compBPlayer2, self.compBPlayer3, self.compBPlayer4]
+
+        self.barPlayers = [self.botBPlayer, self.midBPlayer]
+        #self.nowBars = [self.botBNowBar, self.midBNowBar, self.compBNowBar]
+        self.objects = self.barPlayers + [self.nowBar]
+
+
+        self.canvas.add(self.compBPlayer)
         for obj in self.objects:
             self.canvas.add(obj)
+
 
         dist_between = 75
         key_change_size = (50, 50)
@@ -288,17 +309,52 @@ class MelodySelection(Widget):
     def stop(self):
         for obj in self.objects:
                 obj.stop()
+        self.compBars[self.currCompIndex].stop()
+
+    def next_bars(self):
+        self.canvas.remove(self.nowBar)
+        if self.currCompIndex < len(self.compBars) -1:
+            self.canvas.remove(self.compBars[self.currCompIndex])
+            self.currCompIndex += 1
+            self.canvas.add(self.compBars[self.currCompIndex])
+        self.canvas.add(self.nowBar)
+
+    def prev_bars(self):
+        self.canvas.remove(self.nowBar)
+        if self.currCompIndex > 0:
+            self.canvas.remove(self.compBars[self.currCompIndex])
+            self.currCompIndex -= 1
+            self.canvas.add(self.compBars[self.currCompIndex])
+        self.canvas.add(self.nowBar)        
+
+
+    def four_bar_done_callback(self):
+        print("currIndex: ", self.currCompIndex)
+        if self.currCompIndex < len(self.compBars) - 1:
+            print("in the if statement")
+            self.next_bars()
+            thing = 0
+            #literally here just to slow things down idk
+            for i in range(700000):
+                thing+=1
+            self.botBPlayer.play()
+            self.midBPlayer.play()
+            self.compBars[self.currCompIndex].play()
+            self.nowBar.play()
     
     def on_touch_down(self, touch):
-        self.compBPlayer.on_touch_down(touch)
+        self.compBars[self.currCompIndex].on_touch_down(touch)
+        #self.compBPlayer.on_touch_down(touch)
         for button in self.buttons:
             button.on_touch_down(touch)
     
     def on_touch_move(self, touch):
-        self.compBPlayer.on_touch_move(touch)
+        self.compBars[self.currCompIndex].on_touch_move(touch)
+        #self.compBPlayer.on_touch_move(touch)
 
     def on_touch_up(self, touch):
-        self.compBPlayer.on_touch_up(touch)
+        self.compBars[self.currCompIndex].on_touch_up(touch)
+        #self.compBPlayer.on_touch_up(touch)
 
     def change_chords(self, chords):
         self.midBPlayer.set_notes(chords['midi'])
@@ -312,14 +368,15 @@ class MelodySelection(Widget):
         scaleNotes = self.melody['pitches']
         combinedNotes = combine_changes_and_scale(changeNotes, scaleNotes)
 
-        self.compBPlayer.set_changes(changes)
-        self.compBPlayer.set_allPitches(combinedNotes)
-        self.compBPlayer.set_scaleNotes(scaleNotes)
-        self.compBPlayer.clear_note_graphics()
-        self.compBPlayer.clear_real_notes()
-        self.compBPlayer.lines_to_notes()
-        self.compBPlayer.apply_rules()
-        self.compBPlayer.display_note_graphics()
+        for compBPlayer in self.compBars:
+            compBPlayer.set_changes(changes)
+            compBPlayer.set_allPitches(combinedNotes)
+            compBPlayer.set_scaleNotes(scaleNotes)
+            compBPlayer.clear_note_graphics()
+            compBPlayer.clear_real_notes()
+            compBPlayer.lines_to_notes()
+            compBPlayer.apply_rules()
+            compBPlayer.display_note_graphics()
 
 
     def change_perc(self, perc):
@@ -350,8 +407,15 @@ class MelodySelection(Widget):
         self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
     
     def on_key_down(self, keycode, modifiers):
-        self.compBPlayer.on_key_down(keycode, modifiers)
+        self.compBars[self.currCompIndex].on_key_down(keycode, modifiers)
+        #self.compBPlayer.on_key_down(keycode, modifiers)
         if keycode[1] == 'q':
+            self.canvas.remove(self.nowBar)
+            self.canvas.remove(self.compBars[self.currCompIndex])
+            self.currCompIndex = 0
+            self.canvas.add(self.compBars[self.currCompIndex])
+            self.canvas.add(self.nowBar)             
+            self.compBars[self.currCompIndex].play()
             for obj in self.objects:
                 obj.play()
         elif keycode[1] == 'e':
@@ -362,13 +426,21 @@ class MelodySelection(Widget):
         elif keycode[1] == 'x':
             self.botBPlayer.display_note_graphics()
         elif keycode[1] == 'a':
-            self.compBPlayer.process()
+            self.compBars[self.currCompIndex].process()
+            #self.compBPlayer.process()
         elif keycode[1] == 's':
-            self.compBPlayer.clear_raw_notes()
+            #maybe this should clear all of them?
+            self.compBars[self.currCompIndex].clear_raw_notes()
+            #self.compBPlayer.clear_raw_notes()
+        elif keycode[1] == 'p':
+            self.next_bars()
+        elif keycode[1] == 'o':
+            self.prev_bars()
 
     def on_update(self):     
-        for obj in self.nowBars:
-            obj.on_update()  
+        self.nowBar.on_update()
+        # for obj in self.nowBars:
+        #     obj.on_update()  
 
 
 key_to_transpose = {

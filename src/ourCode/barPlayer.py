@@ -54,7 +54,7 @@ class BarPlayer(InstructionGroup) :
         self.height = size[1]
 
 class LineComposeBarPlayer(BarPlayer):
-    def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, scaleNotes, velocity):
+    def __init__(self, botLeft, size, sched, synth, channel, program, changes, allPitches, scaleNotes, velocity, doneCallback):
         super(LineComposeBarPlayer, self).__init__(botLeft, size, sched, synth, channel, program)
 
         self.rawNotes = [] #[(relX, relY, len)]
@@ -64,6 +64,8 @@ class LineComposeBarPlayer(BarPlayer):
         self.possiblePitches = sorted(allPitches)
         self.scaleNotes = sorted(scaleNotes)
         self.beatBars = []
+
+        self.doneCallback = doneCallback
         
         
         self.lines = []
@@ -93,7 +95,7 @@ class LineComposeBarPlayer(BarPlayer):
         self.display_note_graphics()
 
         # def __init__(self, sched, synth, channel, program, notes, velocity, loop=True, callback = None):
-        self.noteSeq = NoteSequencer(self.sched, self.synth, self.channel, self.program, self.notes, self.velocity)
+        self.noteSeq = NoteSequencer(self.sched, self.synth, self.channel, self.program, self.notes, self.velocity, False, self.noteSeq_done_callback)
 
         self.create_beat_bars()
 
@@ -120,6 +122,9 @@ class LineComposeBarPlayer(BarPlayer):
         self.add(bar)
         self.beatBar.append(bar)
         '''
+
+    def noteSeq_done_callback(self):
+        self.doneCallback()
 
     def set_changes(self, changes):
         self.changes = changes

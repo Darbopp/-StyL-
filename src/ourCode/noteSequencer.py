@@ -20,7 +20,8 @@ class NoteSequencer(object):
         self.channel = channel
         self.program = program
 
-        self.callback = callback
+        self.shouldCallBack = False
+        self.doneCallback = callback
 
         def startBeat(elem):
             return elem[1]
@@ -43,6 +44,8 @@ class NoteSequencer(object):
             return
 
         self.playing = True
+        self.noteIndex = 0
+        self.shouldCallBack = False
 
          # set up the correct sound (program: bank and preset)
         self.synth.program(self.channel, self.program[0], self.program[1])
@@ -96,8 +99,8 @@ class NoteSequencer(object):
             off_tick = tick + length - 1 #the minus 1 allows the same note to be played twice, otherwise the note off canceles the note on
             self.sched.post_at_tick(self._noteoff, off_tick, pitch)
 
-            if self.callback != None:
-                self.callback(pitch, length)
+            # if self.callback != None:
+            #     self.callback(pitch, length)
 
         if self.noteIndex < len(self.notes) - 1:
 
@@ -118,6 +121,8 @@ class NoteSequencer(object):
                 self.cmds.append(cmd)
                 self.noteIndex = 0
             '''
+            if self.doneCallback != None:
+                self.shouldCallBack = True
             self.noteIndex = 0
             self.stop()
 
@@ -125,3 +130,6 @@ class NoteSequencer(object):
     def _noteoff(self, tick, pitch):
         # just turn off the currently sounding note.
         self.synth.noteoff(self.channel, pitch)
+
+        if self.shouldCallBack:
+            self.doneCallback()
