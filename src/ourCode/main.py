@@ -7,6 +7,7 @@ from common.gfxutil import topleft_label
 from common.clock import Clock, SimpleTempoMap, AudioScheduler, tick_str, kTicksPerQuarter, quantize_tick_up
 from common.metro import Metronome
 from common.gfxutil import topleft_label, CEllipse, KFAnim, AnimGroup
+from common.writer import AudioWriter
 
 import numpy as np
 
@@ -462,7 +463,8 @@ class MainWidget(BaseWidget):
     def __init__(self):
         super(MainWidget, self).__init__()
 
-        self.audio = Audio(2)
+        self.writer = AudioWriter('song')
+        self.audio = Audio(2, self.writer.add_audio)
         self.synth = Synth('../data/FluidR3_GM.sf2')
 
         # create TempoMap, AudioScheduler
@@ -579,9 +581,6 @@ class MainWidget(BaseWidget):
         self.perc_option = option
 
         self.melody_selection.change_perc(self.perc[self.perc_option])
-    
-    #def on_layout(self, win_size):
-        #self.active_screen.on_layout(win_size)
 
     def change_screens(self, screen):
         self.remove_widget(self.active_screen)
@@ -596,6 +595,9 @@ class MainWidget(BaseWidget):
     
     def on_key_down(self, keycode, modifiers):
         self.active_screen.on_key_down(keycode, modifiers)
+        
+        if keycode[1] == 'r':
+            self.writer.toggle()
 
     def on_layout(self, winsize):
         if self.style_selection != None:
