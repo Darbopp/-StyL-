@@ -27,7 +27,7 @@ from selectionButton import SelectionButton, BetterButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 from nowBar import NowBar
 
-stylcol = {"Chainsmokers": (0.2, 0, 0, 1), "Ed Sheeran": (0, 0, 0.2, 1)}
+stylcol = {"Chainsmokers": [(0.3, 0, 0, 1), "red"], "Ed Sheeran": [(0, 0, 0.3, 1), "blue"]}
 
 class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
@@ -81,10 +81,9 @@ class KeySelection(FloatLayout):
     def __init__(self, transposeCallback):
         super(KeySelection, self).__init__()
         
-        self.label = Label(text = "text", valign='top', font_size='60sp',
+        self.label = Label(text = "Key", valign='top', font_size='60sp',
               pos=(Window.width, Window.height),
               text_size=(Window.width, Window.height))
-        self.label.text = "Key"
         self.add_widget(self.label)
 
         self.orientation = "vertical"
@@ -161,31 +160,36 @@ class KeySelection(FloatLayout):
         self.label.pos=(w*0.747, h*0.5)
 
 class ChordSelection(FloatLayout):
-    def __init__(self, chordCallback, sched, synth, chord_options):
+    def __init__(self, chordCallback, sched, synth, chord_options, style):
         super(ChordSelection, self).__init__()
         
         self.orientation = "vertical"
 
-        self.label = topleft_label()
-        self.label.text = "Select the chords you would like to use."
+        self.label = Label(text = "Chord", valign='top', font_size='60sp',
+              pos=(Window.width*0.925, Window.height*0.375),
+              text_size=(Window.width, Window.height))
+
+        self.style = style
         self.add_widget(self.label)
 
-        size = (300, 50)
+        size = (550, 550)
         channel = 1
         program = (0,0)
         velocity = 60
         self.options = []
 
-        text1 = "Chord 1"
-        pos1 = (Window.width/2-150, Window.height/2)
+        text1 = ""
+        pos1 = (Window.width*0.45-550, Window.height*0.3)
         notes = chord_options[1]["midi"]
         b1 = SelectionButton(text1, size, pos1, chordCallback, sched, synth, channel, program, notes, velocity, 1)
+        b1.background_normal = "../img/" + self.style + "1.png"
         self.options.append(b1)
 
-        text2 = "Chord 2"
-        pos2 = (Window.width/2-150, Window.height/2 - 200)
+        text2 = ""
+        pos2 = (Window.width*0.55, Window.height*0.3)
         notes = chord_options[2]["midi"]
         b2 = SelectionButton(text2, size, pos2, chordCallback, sched, synth, channel, program, notes, velocity, 2)
+        b2.background_normal = "../img/" + self.style + "2.png"
         self.options.append(b2)
 
         for option in self.options:
@@ -564,7 +568,7 @@ class MainWidget(BaseWidget):
 
     def update_style_screen(self, option):
         self.style = option
-        Window.clearcolor = stylcol[self.style]
+        Window.clearcolor = stylcol[self.style][0]
         self.change_screens(self.key_selection)
         self.screen_index = 1
 
@@ -575,7 +579,7 @@ class MainWidget(BaseWidget):
         self.melody = transpose_melody(self.style, 1, self.transposition)
 
         self.chords = transpose_instrument(self.style, "chords", self.transposition)
-        self.chord_selection = ChordSelection(self.update_chord_screen, self.sched, self.synth, self.chords)
+        self.chord_selection = ChordSelection(self.update_chord_screen, self.sched, self.synth, self.chords, stylcol[self.style][1])
 
         self.perc = transpose_instrument(self.style, "percussion", 0)
         self.perc_selection = PercSelection(self.update_perc_screen, self.sched, self.synth, self.perc)
