@@ -281,14 +281,14 @@ class MelodySelection(Widget):
         b_padding = b_width / 4
         dist_between = b_width + b_padding
 
-        b_height = Window.height / 20
+        b_height = Window.height / 15
         b_y = Window.height - 3*b_padding
         key_change_size = (b_width, b_height)
         change_backing_size = (b_width*2, b_height)
 
         self.b3 = BetterButton("Convert", key_change_size, (b_padding + 2*dist_between, b_y), self.currentCompBar.do_v_b)
         self.b4 = BetterButton("Pitch Snap", key_change_size, (b_padding + 3*dist_between, b_y), self.currentCompBar.do_n)
-        self.b5 = BetterButton("Autocompose", key_change_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_m)
+        self.b5 = BetterButton("Auto Compose", key_change_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_m)
         self.b6 = BetterButton("Toggle Draw/Edit", key_change_size, (b_padding + 5*dist_between, b_y), self.currentCompBar.toggle_select_mode)
 
         b1 = BetterButton("Next", key_change_size, (b_padding, b_y), self.next_bars)
@@ -423,8 +423,8 @@ class MelodySelection(Widget):
         b_padding = b_width / 4
         dist_between = b_width + b_padding
 
-        b_height = h / 20
-        b_y = h - 3*b_padding
+        b_height = h / 15
+        b_y = h - 4*b_padding
         key_change_size = (b_width, b_height)
         change_backing_size = (b_width*2, b_height)
 
