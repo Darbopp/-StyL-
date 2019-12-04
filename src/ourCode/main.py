@@ -249,12 +249,10 @@ class MelodySelection(Widget):
         botBarPlayerSize = (paddedWidth, quarterHeight)
         #def __init__(self, botLeft, size, sched, synth, channel, program, notes, posPitches, velocity):
         self.botBPlayer = StaticBarPlayer(botBarPlayerPos, botBarPlayerSize, self.sched, self.synth, 2, (128,0), perc['midi'], perc['pitches'], 100)
-        self.botBNowBar = NowBar(botBarPlayerPos, botBarPlayerSize, now_bar_padding, self.speed)
 
         midBarPlayerPos = (padding, 2*padding + quarterHeight)
         midBarPlayerSize = (paddedWidth, quarterHeight)
         self.midBPlayer = StaticBarPlayer(midBarPlayerPos, midBarPlayerSize, self.sched, self.synth, 1, (0,0), chords['midi'], chords['pitches'], 60)
-        self.midBNowBar = NowBar(midBarPlayerPos, midBarPlayerSize, now_bar_padding, self.speed)
 
         changesAndNotes = chords_to_changes(chords)
         changes = changesAndNotes[0]
@@ -265,50 +263,43 @@ class MelodySelection(Widget):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
-        self.compBNowBar = NowBar(compBarPlayerPos, compBarPlayerSize, now_bar_padding, self.speed)
-
         self.compBPlayer2 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
-
-
         self.compBPlayer3 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
-
-
         self.compBPlayer4 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
-
-
-        #self.compBPlayer3 = LineComposeBarPlayer(compBarPlayerPos, compBarPlayerSize, self.sched, self.synth, 1, (0,0), changes, combinedNotes, scaleNotes, 110, self.four_bar_done_callback)
-        #self.compBNowBar3 = NowBar(compBarPlayerPos, compBarPlayerSize, now_bar_padding, self.speed)
-
-        self.nowBar = NowBar(botBarPlayerPos, (paddedWidth, halfHeight+quarterHeight+quarterHeight+2*padding), now_bar_padding, self.speed)
-
-
+        self.currentCompBar = self.compBPlayer
         self.compBars = [self.compBPlayer, self.compBPlayer2, self.compBPlayer3, self.compBPlayer4]
 
+        self.nowBar = NowBar(botBarPlayerPos, (paddedWidth, halfHeight+quarterHeight+quarterHeight+2*padding), now_bar_padding, self.speed)
         self.barPlayers = [self.botBPlayer, self.midBPlayer]
-        #self.nowBars = [self.botBNowBar, self.midBNowBar, self.compBNowBar]
         self.objects = self.barPlayers + [self.nowBar]
-
 
         self.canvas.add(self.compBPlayer)
         for obj in self.objects:
             self.canvas.add(obj)
 
-        b_padding = 50
-        dist_between = 75
-        key_change_size = (50, 50)
-        b1 = BetterButton("A", key_change_size, (b_padding/2, Window.height - 1.5*b_padding), change_key)
-        b2 = BetterButton("B", key_change_size, (b_padding/2 + dist_between, Window.height - 1.5*b_padding), change_key)
-        b3 = BetterButton("C", key_change_size, (b_padding/2 + 2*dist_between, Window.height - 1.5*b_padding), change_key)
-        b4 = BetterButton("D", key_change_size, (b_padding/2 + 3*dist_between, Window.height - 1.5*b_padding), change_key)
-        b5 = BetterButton("E", key_change_size, (b_padding/2 + 4*dist_between, Window.height - 1.5*b_padding), change_key)
-        b6 = BetterButton("F", key_change_size, (b_padding/2 + 5*dist_between, Window.height - 1.5*b_padding), change_key)
-        b7 = BetterButton("G", key_change_size, (b_padding/2 + 6*dist_between, Window.height - 1.5*b_padding), change_key)
-        self.keybuttons = [b1, b2, b3, b4, b5, b6, b7]
+        b_width = Window.width / 12.25
+        b_padding = b_width / 4
+        dist_between = b_width + b_padding
 
-        b8 = BetterButton("Change Chord", (100, 50), (b_padding/2 + 7*dist_between, Window.height - 1.5*b_padding), change_chord)
-        b9 = BetterButton("Change Perc", (100, 50), (b_padding/2 + 8.66*dist_between, Window.height - 1.5*b_padding), change_perc)
+        b_height = Window.height / 20
+        b_y = Window.height - 3*b_padding
+        key_change_size = (b_width, b_height)
+        change_backing_size = (b_width*2, b_height)
 
-        self.buttons = self.keybuttons + [b8, b9]
+        self.b3 = BetterButton("Convert", key_change_size, (b_padding + 2*dist_between, b_y), self.currentCompBar.do_v_b)
+        self.b4 = BetterButton("Pitch Snap", key_change_size, (b_padding + 3*dist_between, b_y), self.currentCompBar.do_n)
+        self.b5 = BetterButton("Autocompose", key_change_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_m)
+        self.b6 = BetterButton("Toggle Draw/Edit", key_change_size, (b_padding + 5*dist_between, b_y), self.currentCompBar.toggle_select_mode)
+
+        b1 = BetterButton("Next", key_change_size, (b_padding, b_y), self.next_bars)
+        b2 = BetterButton("Prev", key_change_size, (b_padding + dist_between, b_y), self.prev_bars)
+
+        b7 = BetterButton("Change Chord", change_backing_size, (b_padding + 6*dist_between, b_y), change_chord)
+        b8 = BetterButton("Change Drums", change_backing_size, (b_padding + 7*dist_between + b_width, b_y), change_perc)
+
+        self.swapButtons = [b1, b2]
+        self.computeButtons = [self.b3, self.b4, self.b5, self.b6]
+        self.buttons = self.swapButtons + self.computeButtons + [b7, b8]
         for button in self.buttons:
             self.add_widget(button)
 
@@ -317,20 +308,32 @@ class MelodySelection(Widget):
                 obj.stop()
         self.compBars[self.currCompIndex].stop()
 
-    def next_bars(self):
+    def next_bars(self, yeet):
         self.canvas.remove(self.nowBar)
         if self.currCompIndex < len(self.compBars) -1:
             self.canvas.remove(self.compBars[self.currCompIndex])
             self.currCompIndex += 1
             self.canvas.add(self.compBars[self.currCompIndex])
+            self.currentCompBar = self.compBars[self.currCompIndex]
+
+            self.b3.update_callback(self.compBars[self.currCompIndex].do_v_b)
+            self.b4.update_callback(self.compBars[self.currCompIndex].do_n)
+            self.b5.update_callback(self.compBars[self.currCompIndex].do_m)
+            self.b6.update_callback(self.compBars[self.currCompIndex].toggle_select_mode)
         self.canvas.add(self.nowBar)
 
-    def prev_bars(self):
+    def prev_bars(self, yeet):
         self.canvas.remove(self.nowBar)
         if self.currCompIndex > 0:
             self.canvas.remove(self.compBars[self.currCompIndex])
             self.currCompIndex -= 1
             self.canvas.add(self.compBars[self.currCompIndex])
+            self.currentCompBar = self.compBars[self.currCompIndex]
+
+            self.b3.update_callback(self.currentCompBar.do_v_b)
+            self.b4.update_callback(self.currentCompBar.do_n)
+            self.b5.update_callback(self.currentCompBar.do_m)
+            self.b6.update_callback(self.currentCompBar.toggle_select_mode)
         self.canvas.add(self.nowBar)        
 
 
@@ -406,7 +409,6 @@ class MelodySelection(Widget):
 
         botBarPlayerPos = (padding,padding)
         botBarPlayerSize = (paddedWidth, quarterHeight)
-        #def resize(self, newSize, botLeft):
         self.botBPlayer.resize(botBarPlayerSize, botBarPlayerPos)
 
         midBarPlayerPos = (padding, 2*padding + quarterHeight)
@@ -416,6 +418,23 @@ class MelodySelection(Widget):
         compBarPlayerPos = (padding, 3*padding + 2*quarterHeight)
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
+
+        b_width = w / 12.25
+        b_padding = b_width / 4
+        dist_between = b_width + b_padding
+
+        b_height = h / 20
+        b_y = h - 3*b_padding
+        key_change_size = (b_width, b_height)
+        change_backing_size = (b_width*2, b_height)
+
+        for i in range(len(self.buttons)):
+            b = self.buttons[i]
+            b.pos = (b_padding + dist_between*i, b_y)
+            if i < 6:
+                b.size = key_change_size
+            else:
+                b.size = change_backing_size
     
     def on_key_down(self, keycode, modifiers):
         self.compBars[self.currCompIndex].on_key_down(keycode, modifiers)

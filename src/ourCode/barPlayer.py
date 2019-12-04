@@ -149,7 +149,7 @@ class LineComposeBarPlayer(BarPlayer):
     def stop(self):
         self.noteSeq.stop()
 
-    def toggle_select_mode(self):
+    def toggle_select_mode(self, yeet):
         if not self.isClicking:
             self.isSelecting = not self.isSelecting
         else:
@@ -568,7 +568,24 @@ class LineComposeBarPlayer(BarPlayer):
             self.isSelecting = not self.isSelecting
             self.isMarkedToSelectToggle = False
 
+    def do_v_b(self, yeet):
+        self.resample_lines()
+        self.lines_to_notes()
+        self.display_note_graphics()
 
+    def do_n(self, yeet):
+        self.clear_note_graphics()
+        self.apply_rules()
+        self.noteSeq.change_notes(self.notes)
+        self.display_note_graphics()
+
+    def do_m(self, yeet):
+        self.clear_note_graphics()
+        self.resample_lines()
+        self.lines_to_notes()
+        self.apply_rules()
+        self.noteSeq.change_notes(self.notes)
+        self.display_note_graphics()
 
     def on_key_down(self, keycode, modifiers):
         noteLen = lookup(keycode[1], '12345678' , (.5, 1, 2, 4, -.5, -1, -2, -4))
