@@ -366,17 +366,27 @@ class MelodySelection(Widget):
         button_size = (b_width, b_height)
 
         self.b3 = BetterButton("Convert", button_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_v_b, False)
+        self.b3.background_normal = "../img/orange.png"
         self.b4 = BetterButton("Pitch Snap", button_size, (b_padding + 5*dist_between, b_y), self.currentCompBar.do_n, False)
-        self.b5 = BetterButton("Auto Compose", button_size, (b_padding + 6*dist_between, b_y), self.currentCompBar.do_m, False)
-        self.b6 = BetterButton("Toggle Draw/Edit", button_size, (b_padding + 7*dist_between, b_y), self.currentCompBar.toggle_select_mode, False)
+        self.b4.background_normal = "../img/orange.png"
+        self.b5 = BetterButton("    Auto\nCompose", button_size, (b_padding + 6*dist_between, b_y), self.currentCompBar.do_m, False)
+        self.b5.background_normal = "../img/orange.png"
+        self.b6 = BetterButton("   Toggle \nDraw/Edit", button_size, (b_padding + 7*dist_between, b_y), self.currentCompBar.toggle_select_mode, False)
+        self.b6.background_normal = "../img/orange.png"
 
         b1 = BetterButton("Prev", button_size, (b_padding, b_y), self.prev_bars, False)
+        b1.background_normal = "../img/purple.png"
         b2 = BetterButton("Next", button_size, (b_padding + dist_between, b_y), self.next_bars, False)
+        b2.background_normal = "../img/purple.png"
         b7 = BetterButton("Play/Stop", button_size, (b_padding + 2*dist_between, b_y), self.do_q, False)
+        b7.background_normal = "../img/green.png"
         b8 = BetterButton("Record/Stop", button_size, (b_padding + 3*dist_between, b_y), self.writer.toggle, False)
+        b8.background_normal = "../img/rd.png"
 
         b9 = BetterButton("Change Chord", button_size, (b_padding + 8*dist_between, b_y), change_chord)
+        b9.background_normal = "../img/purple.png"
         b10 = BetterButton("Change Drums", button_size, (b_padding + 9*dist_between, b_y), change_perc)
+        b10.background_normal = "../img/purple.png"
 
         self.controlButtons = [b1, b2, b7, b8]
         self.computeButtons = [self.b3, self.b4, self.b5, self.b6]
