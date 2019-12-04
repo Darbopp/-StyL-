@@ -11,7 +11,9 @@ import random
 from noteSequencer import NoteSequencer
 
 #Get colors of pitches
-def color(pitch): 
+def color(pitch, program): 
+    if program[0] == 128: 
+        return (1, 1, 1, 1)
     red = 0
     blue = 0
     green = 0
@@ -33,6 +35,7 @@ class SelectionButton(Button):
     def __init__(self, text, size, pos, onclick_callback, sched, synth, channel, program, notes, velocity, option, systems):
         super(SelectionButton, self).__init__()
 
+        self.program = program
         self.notes = notes
         self.systems = systems
         self.noteSeq = NoteSequencer(sched, synth, channel, program, notes, velocity, loop=True)
@@ -76,7 +79,7 @@ class SelectionButton(Button):
 
             current = self.currently_playing_pitches()
             if (len(current) > 0): 
-                i.start_color = color(current[int(random.random()*len(current))] % 12)
+                i.start_color = color(current[int(random.random()*len(current))] % 12, self.program)
             else: 
                 i.start_color = (0, 0, 0, 1)
 

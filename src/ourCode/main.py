@@ -231,33 +231,56 @@ class ChordSelection(FloatLayout):
         pass
 
 class PercSelection(FloatLayout):
-    def __init__(self, percCallback, sched, synth, perc_options):
+    def __init__(self, percCallback, sched, synth, perc_options, style):
         super(PercSelection, self).__init__()
         
         self.orientation = "vertical"
 
-        self.label = topleft_label()
-        self.label.text = "Select the percussion you would like to use."
+        self.label = Label(text = "Percussion", valign='top', font_size='60sp',
+              pos=(Window.width*0.875, Window.height*0.375),
+              text_size=(Window.width, Window.height))
+        self.style = style
         self.add_widget(self.label)
 
         self.options = []
-        size = (300, 50)
+        size = (550,550)
         channel = 2
         program = (128,0)
         velocity = 100
 
-        text1 = "Percussion 1"
-        pos1 = (Window.width/2-150, Window.height/2)
+        self.psl = ParticleSystem('particle/pbl.pex')
+        self.psl.emitter_x = 20.
+        self.psl.emitter_y = 20.
+        self.psr = ParticleSystem('particle/pbr.pex')
+        self.psr.emitter_x = Window.width - 20.
+        self.psr.emitter_y = 20.
+        self.psul = ParticleSystem('particle/pbul.pex')
+        self.psul.emitter_x = 20.
+        self.psul.emitter_y = Window.height - 20.
+        self.psur = ParticleSystem('particle/pbur.pex')
+        self.psur.emitter_x = Window.width - 20.
+        self.psur.emitter_y = Window.height - 20.
+
+
+        self.add_widget(self.psl)
+        self.add_widget(self.psr)
+        self.add_widget(self.psul)
+        self.add_widget(self.psur)
+
+        text1 = ""
+        pos1 = (Window.width*0.45-550, Window.height*0.3)
         notes = perc_options[1]["midi"]
-        b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity, 1, [])
+        b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity, 1, [self.psl, self.psul])
+        b1.background_normal = "../img/" + self.style + "3.png"
         self.options.append(b1)
 
-        text2 = "Percussion 2"
-        pos2 = (Window.width/2-150, Window.height/2 - 200)
+        text2 = ""
+        pos2 = (Window.width*0.55, Window.height*0.3)
         notes = perc_options[2]["midi"]
-        b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity, 2, [])
+        b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity, 2, [self.psr, self.psur])
+        b2.background_normal = "../img/" + self.style + "4.png"
         self.options.append(b2)
-        
+
         for option in self.options:
             self.add_widget(option)
     
@@ -602,7 +625,7 @@ class MainWidget(BaseWidget):
         self.chord_selection = ChordSelection(self.update_chord_screen, self.sched, self.synth, self.chords, stylcol[self.style][1])
 
         self.perc = transpose_instrument(self.style, "percussion", 0)
-        self.perc_selection = PercSelection(self.update_perc_screen, self.sched, self.synth, self.perc)
+        self.perc_selection = PercSelection(self.update_perc_screen, self.sched, self.synth, self.perc, stylcol[self.style][1])
 
         self.change_screens(self.chord_selection)
         self.screen_index = 2
