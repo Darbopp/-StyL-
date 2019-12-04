@@ -31,23 +31,30 @@ class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
         super(StyleSelection, self).__init__()
         
+        Window.clearcolor = (0.2, 0.2, 0.2, 0.5)
         self.label = topleft_label()
-        self.label.text = "Select the style of music that you would like to replicate."
+        self.label.text = "Welcome! Select a style to begin."
         self.add_widget(self.label)
 
         self.orientation = "vertical"
         self.button_size = (900, 400)
 
-        b1 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2), styleCallback, "Chainsmokers")
+        title = BetterButton("", self.button_size, (0, 0), lambda x: x, "StyL")
+        title.background_normal = "../img/styl.png"
+        self.title = title
+
+        b1 = BetterButton("", self.button_size, (0, 0), styleCallback, "Chainsmokers")
         b1.background_normal = "../img/chainsmokers.png"
         self.option1 = b1
 
-        b2 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2 - self.button_size[1]), styleCallback, "Ed Sheeran")
+        b2 = BetterButton("", self.button_size, (0, 0), styleCallback, "Ed Sheeran")
         b2.background_normal = "../img/sheeran.png"
         self.option2 = b2
+
         
         self.add_widget(self.option1)
         self.add_widget(self.option2)
+        self.add_widget(self.title)
 
     def on_update(self):
         self.option1.on_update()
@@ -63,9 +70,10 @@ class StyleSelection(FloatLayout):
     def on_layout(self, winsize):
         w = winsize[0]
         h = winsize[1]
-        self.option1.pos = (w/2 - self.button_size[0]/2, h/2)
-        self.option2.pos = (w/2 - self.button_size[0]/2, h/2 - self.button_size[1])
-        self.label.pos=(w * 0.3, h * 0.5)
+        self.option1.pos = (w*0.49 - self.button_size[0], h/6)
+        self.option2.pos = (w*0.51 , h/6)
+        self.title.pos = (w/2 - self.button_size[0]/2, h*2/3)
+        self.label.pos=(w * 0.677, h * 0.15)
 
 class KeySelection(FloatLayout):
     def __init__(self, transposeCallback):
