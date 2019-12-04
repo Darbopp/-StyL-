@@ -18,7 +18,9 @@ from rules import DownBeatChordToneRule
 
 import numpy as np
 
-def clr(pitch, alpha): 
+def clr(pitch, alpha, program): 
+    if program[0] == 128: 
+        return (1, 1, 1, 0.5)
     red = 0
     blue = 0
     green = 0
@@ -219,7 +221,7 @@ class LineComposeBarPlayer(BarPlayer):
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
             beatAndPitch = (note[1], note[0])
-            color = clr(note[0] % 12, 0.5)
+            color = clr(note[0] % 12, 0., self.program)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
             
@@ -703,7 +705,7 @@ class StaticBarPlayer(BarPlayer):
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
             beatAndPitch = (note[1], note[0])
-            color = clr(note[0] % 12, 0.5)
+            color = clr(note[0] % 12, 0.5, self.program)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
             xRange = self.width - 2*20 #+ noteWidth
