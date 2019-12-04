@@ -36,13 +36,15 @@ class StyleSelection(FloatLayout):
         self.add_widget(self.label)
 
         self.orientation = "vertical"
-
-        b1 = Button(text="Chainsmokers", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        self.button_size = (900, 400)
+        b1 = Button(size_hint = (None, None), size = self.button_size)
+        b1.background_normal = "../img/chainsmokers.png"
         b1.bind(on_press=styleCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
-        # b2.bind(on_press=styleCallback)
+        b2 = Button(size_hint = (None, None), size = self.button_size)
+        b2.background_normal = "../img/sheeran.png"
+        #b2.bind(on_press=styleCallback)
         self.option2 = b2
         
         self.add_widget(self.option1)
@@ -60,8 +62,8 @@ class StyleSelection(FloatLayout):
     def on_layout(self, winsize):
         w = winsize[0]
         h = winsize[1]
-        self.option1.pos = (w/2-150, h/2)
-        self.option2.pos = (w/2-150, h/2 - 200)
+        self.option1.pos = (w/2 - self.button_size[0]/2, h/2)
+        self.option2.pos = (w/2 - self.button_size[0]/2, h/2 - self.button_size[1])
         self.label.pos=(w * 0.3, h * 0.5)
 
 class KeySelection(FloatLayout):

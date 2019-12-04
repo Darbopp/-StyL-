@@ -11,7 +11,7 @@ from common.metro import Metronome
 from smallGraphics import NoteShape, ComposeNoteShape, BeatBar, SelectionBox
 from kivy.graphics import Color, Ellipse, Rectangle, Triangle, Line
 from kivy.graphics.instructions import InstructionGroup
-
+from kivy.core.window import Window
 from noteSequencer import NoteSequencer
 
 from rules import DownBeatChordToneRule
@@ -225,7 +225,10 @@ class LineComposeBarPlayer(BarPlayer):
             color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], note, color = color)
+            
+            xRange = self.width - 2*20 #+ noteWidth
+            sizePerBeat = xRange / 16
+            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], note, color = color, qNoteLength = sizePerBeat)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)
@@ -355,7 +358,9 @@ class LineComposeBarPlayer(BarPlayer):
         #self.add(Color(1,.5,.2))
         #discretize plot
         self.clear_lines()
-        threshold = 15 #difference in Y that gets absorbed
+        #difference in Y that gets absorbed
+        threshold = Window.height / 40
+        #threshold = Window.height
         lastYVal = None
         for index,yVal in enumerate(outY):
             xVal = outX[index]
