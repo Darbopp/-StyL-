@@ -51,7 +51,7 @@ class SelectionButton(Button):
 
 
 class BetterButton(Button):
-    def __init__(self, text, size, pos, onclick_callback):
+    def __init__(self, text, size, pos, onclick_callback, callbackThing=None):
         super(BetterButton, self).__init__()
 
         self.text = text
@@ -59,8 +59,12 @@ class BetterButton(Button):
         self.size = size
         self.pos = pos
         self.callback = onclick_callback
+        self.callbackThing = callbackThing
+
+        if callbackThing == None:
+            self.callbackThing = self.text
 
     def on_touch_down(self, touch):
         x, y = touch.pos
         if self.collide_point(x, y):
-            self.callback(self)
+            self.callback(self.callbackThing)

@@ -37,12 +37,15 @@ class StyleSelection(FloatLayout):
 
         self.orientation = "vertical"
         self.button_size = (900, 400)
-        b1 = Button(size_hint = (None, None), size = self.button_size)
+
+        b1 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2), styleCallback, "Chainsmokers")
+        # b1 = Button(size_hint = (None, None), size = self.button_size)
         b1.background_normal = "../img/chainsmokers.png"
-        b1.bind(on_press=styleCallback)
+        # b1.bind(on_press=styleCallback)
         self.option1 = b1
 
-        b2 = Button(size_hint = (None, None), size = self.button_size)
+        b2 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2 - self.button_size[1]), styleCallback, "Ed Sheeran")
+        # b2 = Button(size_hint = (None, None), size = self.button_size)
         b2.background_normal = "../img/sheeran.png"
         #b2.bind(on_press=styleCallback)
         self.option2 = b2
@@ -500,8 +503,8 @@ class MainWidget(BaseWidget):
         self.screen_index = 0
         self.add_widget(self.active_screen)
 
-    def update_style_screen(self, instance):
-        self.style = instance.text
+    def update_style_screen(self, option):
+        self.style = option
 
         self.change_screens(self.key_selection)
         self.screen_index = 1
