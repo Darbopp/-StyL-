@@ -27,6 +27,8 @@ from selectionButton import SelectionButton, BetterButton
 from notes import transpose_instrument, transpose_melody, chords_to_changes, combine_changes_and_scale
 from nowBar import NowBar
 
+stylcol = {"Chainsmokers": (0.2, 0, 0, 1), "Ed Sheeran": (0, 0, 0.2, 1)}
+
 class StyleSelection(FloatLayout):
     def __init__(self, styleCallback):
         super(StyleSelection, self).__init__()
@@ -39,7 +41,7 @@ class StyleSelection(FloatLayout):
         self.orientation = "vertical"
         self.button_size = (900, 400)
 
-        title = BetterButton("", self.button_size, (0, 0), lambda x: x, "StyL")
+        title = BetterButton("", (1400, 620), (0, 0), lambda x: x, "StyL")
         title.background_normal = "../img/styl.png"
         self.title = title
 
@@ -70,41 +72,53 @@ class StyleSelection(FloatLayout):
     def on_layout(self, winsize):
         w = winsize[0]
         h = winsize[1]
-        self.option1.pos = (w*0.49 - self.button_size[0], h/6)
-        self.option2.pos = (w*0.51 , h/6)
-        self.title.pos = (w/2 - self.button_size[0]/2, h*2/3)
-        self.label.pos=(w * 0.677, h * 0.15)
+        self.option1.pos = (w*0.45 - self.button_size[0], h/8)
+        self.option2.pos = (w*0.55 , h/8)
+        self.title.pos = (w/2 - 700, h*0.55)
+        self.label.pos=(w * 0.677, h * 0.07)
 
 class KeySelection(FloatLayout):
     def __init__(self, transposeCallback):
         super(KeySelection, self).__init__()
         
-        self.label = topleft_label()
-        self.label.text = "Select the key that you'd like to use."
+        self.label = Label(text = "text", valign='top', font_size='60sp',
+              pos=(Window.width, Window.height),
+              text_size=(Window.width, Window.height))
+        self.label.text = "Key"
         self.add_widget(self.label)
 
         self.orientation = "vertical"
 
-        self.b1 = Button(text="A", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 225))
-        self.b1.bind(on_press=transposeCallback)
+        self.button_size = (250, 250)
 
-        self.b2 = Button(text="B", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 150))
-        self.b2.bind(on_press=transposeCallback)
 
-        self.b3 = Button(text="C", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 + 75))
-        self.b3.bind(on_press=transposeCallback)
+        self.b1 = BetterButton("A", self.button_size, (0, 0), transposeCallback, "A")
+        self.b2 = BetterButton("A#/Bb", self.button_size, (0, 0), transposeCallback, "A#")
+        self.b3 = BetterButton("B", self.button_size, (0, 0), transposeCallback, "B")
+        self.b4 = BetterButton("C", self.button_size, (0, 0), transposeCallback, "C")
+        self.b5 = BetterButton("C#/Db", self.button_size, (0, 0), transposeCallback, "C#")
+        self.b6 = BetterButton("D", self.button_size, (0, 0), transposeCallback, "D")
+        self.b7 = BetterButton("C#/Eb", self.button_size, (0, 0), transposeCallback, "D#")
+        self.b8 = BetterButton("E", self.button_size, (0, 0), transposeCallback, "E")
+        self.b9 = BetterButton("F", self.button_size, (0, 0), transposeCallback, "F")
+        self.b10 = BetterButton("F#/Gb", self.button_size, (0, 0), transposeCallback, "F#")
+        self.b11 = BetterButton("G", self.button_size, (0, 0), transposeCallback, "G")
+        self.b12 = BetterButton("G#/Ab", self.button_size, (0, 0), transposeCallback, "G#")
 
-        self.b4 = Button(text="D", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
-        self.b4.bind(on_press=transposeCallback)
+        self.b1.background_normal = "../img/gray.png"
+        self.b2.background_normal = "../img/black.png"
+        self.b3.background_normal = "../img/gray.png"
+        self.b4.background_normal = "../img/gray.png"
+        self.b5.background_normal = "../img/black.png"
+        self.b6.background_normal = "../img/gray.png"
+        self.b7.background_normal = "../img/black.png"
+        self.b8.background_normal = "../img/gray.png"
+        self.b9.background_normal = "../img/gray.png"
+        self.b10.background_normal = "../img/black.png"
+        self.b11.background_normal = "../img/gray.png"
+        self.b12.background_normal = "../img/black.png"
 
-        self.b5 = Button(text="E", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 75))
-        self.b5.bind(on_press=transposeCallback)
 
-        self.b6 = Button(text="F", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 150))
-        self.b6.bind(on_press=transposeCallback)
-
-        self.b7 = Button(text="G", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 225))
-        self.b7.bind(on_press=transposeCallback)
         
         self.add_widget(self.b1)
         self.add_widget(self.b2)
@@ -113,6 +127,11 @@ class KeySelection(FloatLayout):
         self.add_widget(self.b5)
         self.add_widget(self.b6)
         self.add_widget(self.b7)
+        self.add_widget(self.b8)
+        self.add_widget(self.b9)
+        self.add_widget(self.b10)
+        self.add_widget(self.b11)
+        self.add_widget(self.b12)
 
     def on_update(self):
         pass
@@ -126,14 +145,20 @@ class KeySelection(FloatLayout):
     def on_layout(self, winsize):
         w = winsize[0]
         h = winsize[1]
-        self.b1.pos = (w/2-150, h/2 + 225)
-        self.b2.pos = (w/2-150, h/2 + 150)
-        self.b3.pos = (w/2-150, h/2 + 75)
-        self.b4.pos = (w/2-150, h/2)
-        self.b5.pos = (w/2-150, h/2 - 75)
-        self.b6.pos = (w/2-150, h/2 - 150)
-        self.b7.pos = (w/2-150, h/2 - 225)
-        self.label.pos=(w * 0.3, h * 0.5)
+        self.b1.pos = (w*1.5/9, h*0.27)
+        self.b2.pos = (w*2/9, h*0.52)
+        self.b3.pos = (w*2.5/9, h*0.27)
+        self.b4.pos = (w*3.5/9, h*0.27)
+        self.b5.pos = (w*4/9, h*0.52)
+        self.b6.pos = (w*4.5/9, h*0.27)
+        self.b7.pos = (w*5/9, h*0.52)
+        self.b8.pos = (w*5.5/9, h*0.27)
+        self.b9.pos = (w*6.5/9, h*0.27)
+        self.b10.pos = (w*7/9, h*0.52)
+        self.b11.pos = (w*7.5/9, h*0.27)
+        self.b12.pos = (w*1/9, h*0.52)
+
+        self.label.pos=(w*0.747, h*0.5)
 
 class ChordSelection(FloatLayout):
     def __init__(self, chordCallback, sched, synth, chord_options):
@@ -483,12 +508,18 @@ class MelodySelection(Widget):
 
 
 key_to_transpose = {
+            
+            "G#": -4,
             "A": -3,
+            "A#": -2,
             "B": -1,
             "C": 0,
+            "C#": 1,
             "D": 2,
+            "D#": 3,
             "E": 4,
             "F": 5,
+            "F#": 6,
             "G": 7
         }
 
@@ -533,12 +564,12 @@ class MainWidget(BaseWidget):
 
     def update_style_screen(self, option):
         self.style = option
-
+        Window.clearcolor = stylcol[self.style]
         self.change_screens(self.key_selection)
         self.screen_index = 1
 
     def update_key_screen(self, instance):
-        self.transposition = key_to_transpose[instance.text]
+        self.transposition = key_to_transpose[instance]
 
         # can now set up melody, chord, percussion settings
         self.melody = transpose_melody(self.style, 1, self.transposition)
@@ -577,7 +608,7 @@ class MainWidget(BaseWidget):
         self.screen_index = 4
 
     def change_key_button(self, instance):
-        self.transposition = key_to_transpose[instance.text]
+        self.transposition = key_to_transpose[instance]
         self.melody = transpose_melody(self.style, 1, self.transposition)
         self.chords = transpose_instrument(self.style, "chords", self.transposition)
 
