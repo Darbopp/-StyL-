@@ -47,7 +47,6 @@ class BarPlayer(InstructionGroup) :
         self.channel = channel
         self.program = program
 
-        self.currentNoteLength = 1
         self.botLeft = botLeft
         self.size = size
         self.width = size[0]
@@ -83,7 +82,6 @@ class LineComposeBarPlayer(BarPlayer):
 
         self.velocity = velocity #volume
 
-        self.currNoteLength = 1
 
         self.color = Color(hsv=(.1, .1, .1), a=1)
         self.background = Rectangle(pos=self.botLeft, size=self.size)
@@ -140,10 +138,6 @@ class LineComposeBarPlayer(BarPlayer):
         self.noteSeq.start()
     
     def toggle(self):
-        if len(self.rawNotes) != len(self.notes):
-            self.clear_real_notes()
-            self.process()
-
         self.noteSeq.toggle()
 
     def stop(self):
@@ -160,9 +154,9 @@ class LineComposeBarPlayer(BarPlayer):
         self.clear_note_graphics()
         self.resample_lines()
         self.lines_to_notes()
-        #self.raw_to_notes()
-        self.display_note_graphics()
+        self.apply_rules()
         self.noteSeq.change_notes(self.notes)
+        self.display_note_graphics()
 
     def set_notes(self, newNotes):
         self.notes = newNotes
@@ -588,12 +582,7 @@ class LineComposeBarPlayer(BarPlayer):
         self.display_note_graphics()
 
     def on_key_down(self, keycode, modifiers):
-        noteLen = lookup(keycode[1], '12345678' , (.5, 1, 2, 4, -.5, -1, -2, -4))
-        if noteLen is not None:
-            self.currNoteLength = noteLen
         
-        if keycode[1] == 'c':
-            self.clear_lines()
         if keycode[1] == 'v':
             self.resample_lines()
         if keycode[1] == 'b':

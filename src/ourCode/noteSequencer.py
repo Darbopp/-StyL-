@@ -61,7 +61,7 @@ class NoteSequencer(object):
             cmd = self.sched.post_at_tick(self._noteon, (next_beat + ticksDeep) )
             self.cmds.append(cmd) #remember to remember the commands incase we need to stop
             #print("note is at", note[1])
-        cmd = self.sched.post_at_tick(self._killself, (next_beat + 480*16 - 30))
+        cmd = self.sched.post_at_tick(self._killself, (next_beat + 480*16 - 40))
         self.cmds.append(cmd)
 
     def stop(self):

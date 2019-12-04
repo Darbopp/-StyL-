@@ -449,6 +449,7 @@ class MelodySelection(Widget):
                 obj.play()
         else:
             self.is_playing = False
+            self.compBars[self.currCompIndex].toggle()
             for obj in self.objects:
                 obj.toggle()
 
@@ -465,20 +466,6 @@ class MelodySelection(Widget):
             self.compBars[self.currCompIndex].play()
             for obj in self.objects:
                 obj.play()
-        elif keycode[1] == 'e':
-            for obj in self.objects:
-                obj.toggle()
-        elif keycode[1] == 'z':
-            self.botBPlayer.clear_note_graphics()
-        elif keycode[1] == 'x':
-            self.botBPlayer.display_note_graphics()
-        elif keycode[1] == 'a':
-            self.compBars[self.currCompIndex].process()
-            #self.compBPlayer.process()
-        elif keycode[1] == 's':
-            #maybe this should clear all of them?
-            self.compBars[self.currCompIndex].clear_raw_notes()
-            #self.compBPlayer.clear_raw_notes()
         elif keycode[1] == 'p':
             self.next_bars()
         elif keycode[1] == 'o':
