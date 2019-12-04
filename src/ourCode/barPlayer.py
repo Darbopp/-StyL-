@@ -149,7 +149,7 @@ class LineComposeBarPlayer(BarPlayer):
     def stop(self):
         self.noteSeq.stop()
 
-    def toggle_select_mode(self, yeet):
+    def toggle_select_mode(self):
         if not self.isClicking:
             self.isSelecting = not self.isSelecting
         else:
@@ -568,18 +568,18 @@ class LineComposeBarPlayer(BarPlayer):
             self.isSelecting = not self.isSelecting
             self.isMarkedToSelectToggle = False
 
-    def do_v_b(self, yeet):
+    def do_v_b(self):
         self.resample_lines()
         self.lines_to_notes()
         self.display_note_graphics()
 
-    def do_n(self, yeet):
+    def do_n(self):
         self.clear_note_graphics()
         self.apply_rules()
         self.noteSeq.change_notes(self.notes)
         self.display_note_graphics()
 
-    def do_m(self, yeet):
+    def do_m(self):
         self.clear_note_graphics()
         self.resample_lines()
         self.lines_to_notes()

@@ -39,21 +39,19 @@ class StyleSelection(FloatLayout):
         self.button_size = (900, 400)
 
         b1 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2), styleCallback, "Chainsmokers")
-        # b1 = Button(size_hint = (None, None), size = self.button_size)
         b1.background_normal = "../img/chainsmokers.png"
-        # b1.bind(on_press=styleCallback)
         self.option1 = b1
 
         b2 = BetterButton("", self.button_size, (Window.width/2 - self.button_size[0]/2, Window.height/2 - self.button_size[1]), styleCallback, "Ed Sheeran")
-        # b2 = Button(size_hint = (None, None), size = self.button_size)
         b2.background_normal = "../img/sheeran.png"
-        #b2.bind(on_press=styleCallback)
         self.option2 = b2
         
         self.add_widget(self.option1)
         self.add_widget(self.option2)
 
     def on_update(self):
+        self.option1.on_update()
+        self.option2.on_update()
         return
 
     def on_touch_move(self, touch):
@@ -222,7 +220,7 @@ class PercSelection(FloatLayout):
         pass
         
 class MelodySelection(Widget):
-    def __init__(self, synth, sched, chords, perc, melody, change_key, change_chord, change_perc):
+    def __init__(self, synth, sched, chords, perc, melody, change_key, change_chord, change_perc, writer):
         super(MelodySelection, self).__init__()
         w = Window.width
         h = Window.height
@@ -234,6 +232,8 @@ class MelodySelection(Widget):
         # Audio Generation
         self.synth = synth
         self.sched = sched
+        self.writer = writer
+        self.is_playing = False
 
         halfHeight = (h - 4*padding) / 2
         quarterHeight = halfHeight / 3
@@ -277,29 +277,30 @@ class MelodySelection(Widget):
         for obj in self.objects:
             self.canvas.add(obj)
 
-        b_width = Window.width / 12.25
+        b_width = Window.width / 15
         b_padding = b_width / 4
         dist_between = b_width + b_padding
 
         b_height = Window.height / 15
         b_y = Window.height - 3*b_padding
-        key_change_size = (b_width, b_height)
-        change_backing_size = (b_width*2, b_height)
+        button_size = (b_width, b_height)
 
-        self.b3 = BetterButton("Convert", key_change_size, (b_padding + 2*dist_between, b_y), self.currentCompBar.do_v_b)
-        self.b4 = BetterButton("Pitch Snap", key_change_size, (b_padding + 3*dist_between, b_y), self.currentCompBar.do_n)
-        self.b5 = BetterButton("Auto Compose", key_change_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_m)
-        self.b6 = BetterButton("Toggle Draw/Edit", key_change_size, (b_padding + 5*dist_between, b_y), self.currentCompBar.toggle_select_mode)
+        self.b3 = BetterButton("Convert", button_size, (b_padding + 4*dist_between, b_y), self.currentCompBar.do_v_b, False)
+        self.b4 = BetterButton("Pitch Snap", button_size, (b_padding + 5*dist_between, b_y), self.currentCompBar.do_n, False)
+        self.b5 = BetterButton("Auto Compose", button_size, (b_padding + 6*dist_between, b_y), self.currentCompBar.do_m, False)
+        self.b6 = BetterButton("Toggle Draw/Edit", button_size, (b_padding + 7*dist_between, b_y), self.currentCompBar.toggle_select_mode, False)
 
-        b1 = BetterButton("Next", key_change_size, (b_padding, b_y), self.next_bars)
-        b2 = BetterButton("Prev", key_change_size, (b_padding + dist_between, b_y), self.prev_bars)
+        b1 = BetterButton("Prev", button_size, (b_padding, b_y), self.prev_bars, False)
+        b2 = BetterButton("Next", button_size, (b_padding + dist_between, b_y), self.next_bars, False)
+        b7 = BetterButton("Play/Stop", button_size, (b_padding + 2*dist_between, b_y), self.do_q, False)
+        b8 = BetterButton("Record/Stop", button_size, (b_padding + 3*dist_between, b_y), self.writer.toggle, False)
 
-        b7 = BetterButton("Change Chord", change_backing_size, (b_padding + 6*dist_between, b_y), change_chord)
-        b8 = BetterButton("Change Drums", change_backing_size, (b_padding + 7*dist_between + b_width, b_y), change_perc)
+        b9 = BetterButton("Change Chord", button_size, (b_padding + 8*dist_between, b_y), change_chord)
+        b10 = BetterButton("Change Drums", button_size, (b_padding + 9*dist_between, b_y), change_perc)
 
-        self.swapButtons = [b1, b2]
+        self.controlButtons = [b1, b2, b7, b8]
         self.computeButtons = [self.b3, self.b4, self.b5, self.b6]
-        self.buttons = self.swapButtons + self.computeButtons + [b7, b8]
+        self.buttons = self.controlButtons + self.computeButtons + [b9, b10]
         for button in self.buttons:
             self.add_widget(button)
 
@@ -308,7 +309,7 @@ class MelodySelection(Widget):
                 obj.stop()
         self.compBars[self.currCompIndex].stop()
 
-    def next_bars(self, yeet):
+    def next_bars(self):
         self.canvas.remove(self.nowBar)
         if self.currCompIndex < len(self.compBars) -1:
             self.canvas.remove(self.compBars[self.currCompIndex])
@@ -322,7 +323,7 @@ class MelodySelection(Widget):
             self.b6.update_callback(self.compBars[self.currCompIndex].toggle_select_mode)
         self.canvas.add(self.nowBar)
 
-    def prev_bars(self, yeet):
+    def prev_bars(self):
         self.canvas.remove(self.nowBar)
         if self.currCompIndex > 0:
             self.canvas.remove(self.compBars[self.currCompIndex])
@@ -336,7 +337,6 @@ class MelodySelection(Widget):
             self.b6.update_callback(self.currentCompBar.toggle_select_mode)
         self.canvas.add(self.nowBar)        
 
-
     def four_bar_done_callback(self):
         #print("currIndex: ", self.currCompIndex)
         if self.currCompIndex < len(self.compBars) - 1:
@@ -345,7 +345,7 @@ class MelodySelection(Widget):
             self.botBPlayer.stop()
             self.midBPlayer.stop()
             # self.nowBar.stop()
-            self.next_bars(None)
+            self.next_bars()
             # thing = 0
             # #literally here just to slow things down idk
             # for i in range(700000):
@@ -436,10 +436,27 @@ class MelodySelection(Widget):
             else:
                 b.size = change_backing_size
     
+    def do_q(self):
+        if not self.is_playing:
+            self.is_playing = True
+            self.canvas.remove(self.nowBar)
+            self.canvas.remove(self.compBars[self.currCompIndex])
+            self.currCompIndex = 0
+            self.canvas.add(self.compBars[self.currCompIndex])
+            self.canvas.add(self.nowBar)             
+            self.compBars[self.currCompIndex].play()
+            for obj in self.objects:
+                obj.play()
+        else:
+            self.is_playing = False
+            for obj in self.objects:
+                obj.toggle()
+
     def on_key_down(self, keycode, modifiers):
         self.compBars[self.currCompIndex].on_key_down(keycode, modifiers)
         #self.compBPlayer.on_key_down(keycode, modifiers)
         if keycode[1] == 'q':
+            self.is_playing = True
             self.canvas.remove(self.nowBar)
             self.canvas.remove(self.compBars[self.currCompIndex])
             self.currCompIndex = 0
@@ -463,9 +480,9 @@ class MelodySelection(Widget):
             self.compBars[self.currCompIndex].clear_raw_notes()
             #self.compBPlayer.clear_raw_notes()
         elif keycode[1] == 'p':
-            self.next_bars(None)
+            self.next_bars()
         elif keycode[1] == 'o':
-            self.prev_bars(None)
+            self.prev_bars()
 
     def on_update(self):     
         self.nowBar.on_update()
@@ -561,7 +578,8 @@ class MainWidget(BaseWidget):
             self.melody,
             self.change_key_button,
             self.change_chord_button,
-            self.change_perc_button
+            self.change_perc_button,
+            self.writer
             )
         self.change_screens(self.melody_selection)
         self.screen_index = 4
@@ -581,7 +599,8 @@ class MainWidget(BaseWidget):
             self.melody,
             self.change_key_button,
             self.change_chord_button,
-            self.change_perc_button
+            self.change_perc_button,
+            self.writer
             )
         self.add_widget(self.melody_selection)
         self.active_screen = self.melody_selection

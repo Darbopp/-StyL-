@@ -67,7 +67,13 @@ class BetterButton(Button):
     def on_touch_down(self, touch):
         x, y = touch.pos
         if self.collide_point(x, y):
-            self.callback(self.callbackThing)
+            if self.callbackThing:
+                self.callback(self.callbackThing)
+            else:
+                self.callback()
 
     def update_callback(self, func):
         self.callback = func
+
+    def on_update(self):
+        return
