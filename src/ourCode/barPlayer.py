@@ -170,6 +170,9 @@ class LineComposeBarPlayer(BarPlayer):
     def clear_real_notes(self):
         self.notes = []
 
+    def update_seq_notes(self):
+        self.noteSeq.change_notes(self.notes)
+
     '''
     Clears the note graphics. Should be used when notes is changed
     '''

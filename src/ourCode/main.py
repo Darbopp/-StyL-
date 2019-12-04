@@ -391,6 +391,7 @@ class MelodySelection(Widget):
             compBPlayer.lines_to_notes()
             compBPlayer.apply_rules()
             compBPlayer.display_note_graphics()
+            compBPlayer.update_seq_notes()
 
 
     def change_perc(self, perc):
