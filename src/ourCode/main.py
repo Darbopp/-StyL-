@@ -277,7 +277,7 @@ class MelodySelection(Widget):
         for obj in self.objects:
             self.canvas.add(obj)
 
-        b_width = Window.width / 15
+        b_width = Window.width / 12.75
         b_padding = b_width / 4
         dist_between = b_width + b_padding
 
@@ -419,22 +419,18 @@ class MelodySelection(Widget):
         compBarPlayerSize = (paddedWidth, halfHeight)
         self.compBPlayer.resize(compBarPlayerSize, compBarPlayerPos)
 
-        b_width = w / 12.25
+        b_width = Window.width / 15
         b_padding = b_width / 4
         dist_between = b_width + b_padding
 
-        b_height = h / 15
-        b_y = h - 4*b_padding
-        key_change_size = (b_width, b_height)
-        change_backing_size = (b_width*2, b_height)
+        b_height = Window.height / 15
+        b_y = Window.height - 3*b_padding
+        button_size = (b_width, b_height)
 
         for i in range(len(self.buttons)):
             b = self.buttons[i]
             b.pos = (b_padding + dist_between*i, b_y)
-            if i < 6:
-                b.size = key_change_size
-            else:
-                b.size = change_backing_size
+            b.size = button_size
     
     def do_q(self):
         if not self.is_playing:
