@@ -714,7 +714,9 @@ class StaticBarPlayer(BarPlayer):
             color = clr(note[0] % 12, 0.5)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
-            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], color = color)
+            xRange = self.width - 2*20 #+ noteWidth
+            sizePerBeat = xRange / 16
+            noteGraphic = NoteShape(absCoords, note[2], relativeNoteCoords[2], color = color, qNoteLength = sizePerBeat)
 
             self.add(noteGraphic)
             self.graphicNotes.append(noteGraphic)

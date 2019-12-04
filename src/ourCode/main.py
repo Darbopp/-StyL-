@@ -345,7 +345,7 @@ class MelodySelection(Widget):
             self.botBPlayer.stop()
             self.midBPlayer.stop()
             # self.nowBar.stop()
-            self.next_bars()
+            self.next_bars(None)
             # thing = 0
             # #literally here just to slow things down idk
             # for i in range(700000):
@@ -463,9 +463,9 @@ class MelodySelection(Widget):
             self.compBars[self.currCompIndex].clear_raw_notes()
             #self.compBPlayer.clear_raw_notes()
         elif keycode[1] == 'p':
-            self.next_bars()
+            self.next_bars(None)
         elif keycode[1] == 'o':
-            self.prev_bars()
+            self.prev_bars(None)
 
     def on_update(self):     
         self.nowBar.on_update()
