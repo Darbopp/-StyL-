@@ -29,7 +29,7 @@ class NoteSequencer(object):
         #we sort notes by startBeat because the noteOn needs to know which note it should be playing
         self.notes = notes
         self.notes.sort(key=startBeat)
-
+        self.next_beat = 0
 
         self.velocity = velocity
         self.loop = loop # not currently functional
@@ -52,17 +52,18 @@ class NoteSequencer(object):
 
         # find the tick of the next beat, and make it "beat aligned"
         now = self.sched.get_tick()
-        next_beat = quantize_tick_up(now, 480)
+        self.next_beat = quantize_tick_up(now, 480)
 
         #Since we are now supporting chords,
         #all notes need to be scheduled now
         for note in self.notes:
             ticksDeep = 480*note[1]
-            cmd = self.sched.post_at_tick(self._noteon, (next_beat + ticksDeep) )
+            cmd = self.sched.post_at_tick(self._noteon, (self.next_beat + ticksDeep) )
             self.cmds.append(cmd) #remember to remember the commands incase we need to stop
             #print("note is at", note[1])
-        cmd = self.sched.post_at_tick(self._killself, (next_beat + 480*16 - 40))
+        cmd = self.sched.post_at_tick(self._killself, (self.next_beat + 480*16 - 40))
         self.cmds.append(cmd)
+        print(self.cmds)
 
     def stop(self):
         if not self.playing:

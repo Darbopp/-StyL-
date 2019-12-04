@@ -8,6 +8,7 @@ from common.clock import Clock, SimpleTempoMap, AudioScheduler, tick_str, kTicks
 from common.metro import Metronome
 from common.gfxutil import topleft_label, CEllipse, KFAnim, AnimGroup
 from common.writer import AudioWriter
+from common.kivyparticle import ParticleSystem
 
 import numpy as np
 
@@ -178,17 +179,36 @@ class ChordSelection(FloatLayout):
         velocity = 60
         self.options = []
 
+        self.psl = ParticleSystem('particle/pbl.pex')
+        self.psl.emitter_x = 20.
+        self.psl.emitter_y = 20.
+        self.psr = ParticleSystem('particle/pbr.pex')
+        self.psr.emitter_x = Window.width - 20.
+        self.psr.emitter_y = 20.
+        self.psul = ParticleSystem('particle/pbul.pex')
+        self.psul.emitter_x = 20.
+        self.psul.emitter_y = Window.height - 20.
+        self.psur = ParticleSystem('particle/pbur.pex')
+        self.psur.emitter_x = Window.width - 20.
+        self.psur.emitter_y = Window.height - 20.
+
+
+        self.add_widget(self.psl)
+        self.add_widget(self.psr)
+        self.add_widget(self.psul)
+        self.add_widget(self.psur)
+
         text1 = ""
         pos1 = (Window.width*0.45-550, Window.height*0.3)
         notes = chord_options[1]["midi"]
-        b1 = SelectionButton(text1, size, pos1, chordCallback, sched, synth, channel, program, notes, velocity, 1)
+        b1 = SelectionButton(text1, size, pos1, chordCallback, sched, synth, channel, program, notes, velocity, 1, [self.psl, self.psul])
         b1.background_normal = "../img/" + self.style + "1.png"
         self.options.append(b1)
 
         text2 = ""
         pos2 = (Window.width*0.55, Window.height*0.3)
         notes = chord_options[2]["midi"]
-        b2 = SelectionButton(text2, size, pos2, chordCallback, sched, synth, channel, program, notes, velocity, 2)
+        b2 = SelectionButton(text2, size, pos2, chordCallback, sched, synth, channel, program, notes, velocity, 2, [self.psr, self.psur])
         b2.background_normal = "../img/" + self.style + "2.png"
         self.options.append(b2)
 
@@ -229,13 +249,13 @@ class PercSelection(FloatLayout):
         text1 = "Percussion 1"
         pos1 = (Window.width/2-150, Window.height/2)
         notes = perc_options[1]["midi"]
-        b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity, 1)
+        b1 = SelectionButton(text1, size, pos1, percCallback, sched, synth, channel, program, notes, velocity, 1, [])
         self.options.append(b1)
 
         text2 = "Percussion 2"
         pos2 = (Window.width/2-150, Window.height/2 - 200)
         notes = perc_options[2]["midi"]
-        b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity, 2)
+        b2 = SelectionButton(text2, size, pos2, percCallback, sched, synth, channel, program, notes, velocity, 2, [])
         self.options.append(b2)
         
         for option in self.options:
