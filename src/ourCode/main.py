@@ -37,12 +37,14 @@ class StyleSelection(FloatLayout):
 
         self.orientation = "vertical"
 
-        b1 = Button(text="Chainsmokers", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2))
+        b1 = Button(size_hint = (None, None), size = (600, 200), pos = (Window.width/2-700, Window.height*3/4))
+        b1.background_normal = "../img/chainsmokers.png"
         b1.bind(on_press=styleCallback)
         self.option1 = b1
 
-        b2 = Button(text="Fake", size_hint = (None, None), size = (300, 50), pos = (Window.width/2-150, Window.height/2 - 200))
-        # b2.bind(on_press=styleCallback)
+        b2 = Button(size_hint = (None, None), size = (600, 200), pos = (Window.width/2-450, Window.height/4))
+        b2.background_normal = "../img/sheeran.png"
+        #b2.bind(on_press=styleCallback)
         self.option2 = b2
         
         self.add_widget(self.option1)
