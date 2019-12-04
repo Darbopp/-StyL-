@@ -220,8 +220,9 @@ class LineComposeBarPlayer(BarPlayer):
     
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
+            print(note)
             beatAndPitch = (note[1], note[0])
-            color = clr(note[0] % 12, 0., self.program)
+            color = clr(note[0] % 12, 0.5, self.program)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
             absCoords = (relativeNoteCoords[0]+self.botLeft[0], relativeNoteCoords[1]+self.botLeft[1]) # get screen coords
             
