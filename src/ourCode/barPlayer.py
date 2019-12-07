@@ -220,7 +220,7 @@ class LineComposeBarPlayer(BarPlayer):
     
     def display_note_graphics(self):
         for note in self.notes: #[(pitch, startBeat, len)]
-            print(note)
+            #print(note)
             beatAndPitch = (note[1], note[0])
             color = clr(note[0] % 12, 0.5, self.program)
             relativeNoteCoords = self.note_to_coord(beatAndPitch) #get our relative coords
@@ -243,12 +243,13 @@ class LineComposeBarPlayer(BarPlayer):
             self.remove(line)
 
     def select_notes(self):
-        selectPoints = self.selectionBox.get_points()
+        if self.selectionBox != None:
+            selectPoints = self.selectionBox.get_points()
 
-        for gNote in self.graphicNotes:
-            if gNote.does_intersect_points(selectPoints):
-                self.selectedNotes.append(gNote)
-                gNote.highlight()
+            for gNote in self.graphicNotes:
+                if gNote.does_intersect_points(selectPoints):
+                    self.selectedNotes.append(gNote)
+                    gNote.highlight()
 
     def deselect_notes(self):
         for gNote in self.selectedNotes:
@@ -559,9 +560,10 @@ class LineComposeBarPlayer(BarPlayer):
 
         if self.isSelecting:
             #find notes selected and highlight them
-            self.select_notes()
-            self.remove(self.selectionBox)
-            self.selectionBox = None
+            if self.selectionBox is not None:
+                self.select_notes()
+                self.remove(self.selectionBox)
+                self.selectionBox = None
 
         self.isClicking = False
         if self.isMarkedToSelectToggle:

@@ -63,7 +63,7 @@ class NoteSequencer(object):
             #print("note is at", note[1])
         cmd = self.sched.post_at_tick(self._killself, (self.next_beat + 480*16 - 40))
         self.cmds.append(cmd)
-        print(self.cmds)
+        #print(self.cmds)
 
     def stop(self):
         if not self.playing:
